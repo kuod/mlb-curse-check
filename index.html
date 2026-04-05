@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLB Luck Factor 2015–2024</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1117;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    max-width: 1400px;
+    margin: 0 auto 24px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    max-width: 700px;
+    line-height: 1.5;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+
+  .controls label {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-right: 4px;
+  }
+
+  .sort-btn {
+    background: #1e2333;
+    border: 1px solid #2d3748;
+    color: #cbd5e1;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sort-btn:hover { background: #2d3748; color: #f1f5f9; }
+  .sort-btn.active { background: #2563eb; border-color: #3b82f6; color: #fff; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .legend-block { display: flex; flex-direction: column; gap: 6px; }
+  .legend-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+
+  .color-scale {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .color-bar {
+    width: 160px;
+    height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(to right,
+      hsl(0, 70%, 55%),
+      hsl(0, 60%, 75%),
+      #ffffff,
+      hsl(120, 50%, 75%),
+      hsl(120, 60%, 55%)
+    );
+  }
+  .color-scale span { font-size: 0.72rem; color: #94a3b8; }
+
+  .badge-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  /* ── Table wrapper ── */
+  .table-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #1e2333;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.82rem;
+  }
+
+  thead tr {
+    background: #161b27;
+    border-bottom: 2px solid #2d3748;
+  }
+
+  th {
+    padding: 10px 8px;
+    text-align: center;
+    font-weight: 600;
+    color: #94a3b8;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+  }
+
+  th.team-col {
+    text-align: left;
+    padding-left: 14px;
+    min-width: 160px;
+    position: sticky;
+    left: 0;
+    background: #161b27;
+    z-index: 2;
+  }
+
+  th.summary-col { color: #cbd5e1; }
+
+  tbody tr {
+    border-bottom: 1px solid #1a2035;
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+  td {
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 72px;
+  }
+
+  td.team-col {
+    text-align: left;
+    padding: 10px 12px 10px 14px;
+    position: sticky;
+    left: 0;
+    background: #0f1117;
+    z-index: 1;
+    border-right: 1px solid #1e2333;
+  }
+  tbody tr:hover td.team-col { background: #12151f; }
+
+  .team-name { font-weight: 600; color: #e2e8f0; }
+  .team-abbr { font-size: 0.68rem; color: #64748b; margin-top: 1px; }
+
+  td.summary-col {
+    font-weight: 700;
+    font-size: 0.85rem;
+    min-width: 60px;
+    padding: 0 8px;
+    background: #0d1019;
+  }
+
+  /* ── Season cell ── */
+  .cell-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 4px;
+    min-height: 52px;
+    cursor: default;
+    border-radius: 0;
+  }
+
+  .luck-value {
+    font-weight: 700;
+    font-size: 0.88rem;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 1px 4px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .badge-ws    { background: #f59e0b; color: #1a0a00; }
+  .badge-pennant-al { background: #c0c0c0; color: #111; }
+  .badge-pennant-nl { background: #b8c4cf; color: #111; }
+  .badge-lcs   { background: #ea580c; color: #fff; }
+  .badge-ds    { background: #2563eb; color: #fff; }
+  .badge-wc    { background: #7c3aed; color: #fff; }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: #1e2435;
+    border: 1px solid #3d4d6a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: #e2e8f0;
+    pointer-events: none;
+    max-width: 260px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  #tooltip strong { color: #93c5fd; display: block; margin-bottom: 4px; font-size: 0.82rem; }
+  #tooltip .tip-row { display: flex; justify-content: space-between; gap: 20px; }
+  #tooltip .tip-label { color: #94a3b8; }
+  #tooltip .tip-val { font-weight: 600; }
+  #tooltip .tip-lucky  { color: #86efac; }
+  #tooltip .tip-unlucky { color: #fca5a5; }
+  #tooltip hr { border: none; border-top: 1px solid #2d3d5a; margin: 6px 0; }
+
+  /* ── Summary luck coloring ── */
+  .luck-pos { color: #86efac; }
+  .luck-neg { color: #fca5a5; }
+  .luck-neu { color: #94a3b8; }
+
+  /* ── Loading ── */
+  #loading {
+    max-width: 1400px;
+    margin: 60px auto;
+    text-align: center;
+    color: #64748b;
+    font-size: 1rem;
+  }
+
+  /* ── Footnote ── */
+  .footnote {
+    max-width: 1400px;
+    margin: 16px auto 0;
+    font-size: 0.72rem;
+    color: #475569;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MLB Luck Factor &nbsp;2015–2024</h1>
+  <p class="subtitle">
+    Composite of <strong>Pythagorean luck</strong> (actual wins minus run-differential-expected wins)
+    and <strong>close-game luck</strong> (≤2-run margin win% vs overall win%). Positive = luckier than
+    underlying performance suggests. Values in wins above/below expectation.
+  </p>
+
+  <div class="controls">
+    <label>Sort by:</label>
+    <button class="sort-btn active" id="btn-total" onclick="setSort('totalLuck')">Total Luck ▼</button>
+    <button class="sort-btn" id="btn-avg" onclick="setSort('avgLuck')">Avg Luck/Season</button>
+    <button class="sort-btn" id="btn-name" onclick="setSort('name')">Team Name</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-block">
+      <span class="legend-title">Luck Scale (wins above/below expectation)</span>
+      <div class="color-scale">
+        <span>−10</span>
+        <div class="color-bar"></div>
+        <span>+10</span>
+      </div>
+    </div>
+    <div class="legend-block">
+      <span class="legend-title">Playoff Result</span>
+      <div class="badge-legend">
+        <span class="badge badge-ws">WS</span> Won World Series &nbsp;
+        <span class="badge badge-pennant-al">AL</span>/<span class="badge badge-pennant-nl">NL</span> Pennant &nbsp;
+        <span class="badge badge-lcs">LCS</span> Lost in LCS &nbsp;
+        <span class="badge badge-ds">DS</span> Lost in DS &nbsp;
+        <span class="badge badge-wc">WC</span> Lost in WC
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="loading">Loading data…</div>
+<div class="table-wrapper" id="table-container" style="display:none">
+  <table id="luck-table">
+    <thead id="table-head"></thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+<p class="footnote" id="footnote" style="display:none">
+  * 2020 was a shortened 60-game season; luck values are in the same wins-above-expected units but carry higher variance.<br>
+  Pythagorean formula: RS<sup>1.83</sup> / (RS<sup>1.83</sup> + RA<sup>1.83</sup>) × GP. Close-game luck: (close-game win% − overall win%) × close games played.
+  Composite = 0.6 × Pythagorean luck + 0.4 × close-game luck. Data via MLB Stats API.
+</p>
+
+<div id="tooltip" style="display:none"></div>
+
+<script>
+let allData = null;
+let sortKey = 'totalLuck';
+let sortDir = 'desc';
+
+const tooltip = document.getElementById('tooltip');
+
+function luckToColor(value) {
+  const v = Math.max(-10, Math.min(10, value));
+  if (v >= 0) {
+    const t = v / 10;
+    const l = 100 - t * 40;
+    const s = t * 60;
+    return `hsl(120,${s}%,${l}%)`;
+  } else {
+    const t = -v / 10;
+    const l = 100 - t * 35;
+    const s = t * 70;
+    return `hsl(0,${s}%,${l}%)`;
+  }
+}
+
+function fmtLuck(v) {
+  if (v === null || v === undefined) return '—';
+  const sign = v >= 0 ? '+' : '';
+  return sign + v.toFixed(1);
+}
+
+function luckClass(v) {
+  if (v > 0.5) return 'luck-pos';
+  if (v < -0.5) return 'luck-neg';
+  return 'luck-neu';
+}
+
+function badgeHtml(outcome, league) {
+  if (!outcome || outcome === 'MISSED') return '';
+  const leagueSuffix = league === 'AL' ? 'al' : 'nl';
+  const map = {
+    WS_CHAMP: `<span class="badge badge-ws">WS</span>`,
+    PENNANT:  `<span class="badge badge-pennant-${leagueSuffix}">${league}</span>`,
+    LCS:      `<span class="badge badge-lcs">LCS</span>`,
+    DS:       `<span class="badge badge-ds">DS</span>`,
+    WC:       `<span class="badge badge-wc">WC</span>`,
+  };
+  return map[outcome] || '';
+}
+
+// Determine league from abbreviation (hardcoded — doesn't change per year)
+const AL_TEAMS = new Set(['BAL','BOS','CWS','CLE','DET','HOU','KC','LAA','MIN','NYY','OAK','ATH','SEA','TB','TEX','TOR']);
+
+function getLeague(abbr) {
+  return AL_TEAMS.has(abbr) ? 'AL' : 'NL';
+}
+
+function buildTooltip(teamName, year, s) {
+  const league = '';
+  const pctFmt = p => (p * 100).toFixed(1) + '%';
+  const overallPct = s.gamesPlayed > 0 ? s.wins / s.gamesPlayed : 0;
+  const closePct = s.closeGames > 0 ? s.closeWins / s.closeGames : 0;
+
+  const pythSign = s.pythLuck >= 0 ? '+' : '';
+  const closeSign = s.closeLuck >= 0 ? '+' : '';
+  const compSign = s.compositeLuck >= 0 ? '+' : '';
+
+  const pythClass = s.pythLuck >= 0 ? 'tip-lucky' : 'tip-unlucky';
+  const closeClass = s.closeLuck >= 0 ? 'tip-lucky' : 'tip-unlucky';
+  const compClass = s.compositeLuck >= 0 ? 'tip-lucky' : 'tip-unlucky';
+
+  return `
+    <strong>${s.teamNameThatYear} ${year}</strong>
+    <div class="tip-row"><span class="tip-label">Record</span><span class="tip-val">${s.wins}–${s.losses} (${pctFmt(overallPct)})</span></div>
+    <div class="tip-row"><span class="tip-label">RS / RA</span><span class="tip-val">${s.runsScored} / ${s.runsAllowed}</span></div>
+    <hr>
+    <div class="tip-row"><span class="tip-label">Pyth expected W</span><span class="tip-val">${s.pythExpectedWins}</span></div>
+    <div class="tip-row"><span class="tip-label">Pyth luck</span><span class="tip-val ${pythClass}">${pythSign}${s.pythLuck.toFixed(1)} W</span></div>
+    <hr>
+    <div class="tip-row"><span class="tip-label">Close games (≤2R)</span><span class="tip-val">${s.closeWins}–${s.closeLosses} (${pctFmt(closePct)})</span></div>
+    <div class="tip-row"><span class="tip-label">Close-game luck</span><span class="tip-val ${closeClass}">${closeSign}${s.closeLuck.toFixed(1)} W</span></div>
+    <hr>
+    <div class="tip-row"><span class="tip-label">Composite luck</span><span class="tip-val ${compClass}">${compSign}${s.compositeLuck.toFixed(1)} W</span></div>
+  `.trim();
+}
+
+function renderTable() {
+  if (!allData) return;
+
+  const seasons = allData.metadata.seasons;
+  const teams = [...allData.teams];
+
+  // Sort
+  teams.sort((a, b) => {
+    let va, vb;
+    if (sortKey === 'name') {
+      va = a.name; vb = b.name;
+      return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    }
+    va = a[sortKey] ?? 0;
+    vb = b[sortKey] ?? 0;
+    return sortDir === 'asc' ? va - vb : vb - va;
+  });
+
+  // Head
+  const thead = document.getElementById('table-head');
+  thead.innerHTML = '';
+  const hr = document.createElement('tr');
+  hr.innerHTML = `<th class="team-col">Team</th>` +
+    seasons.map(y => `<th>${y === 2020 ? '2020*' : y}</th>`).join('') +
+    `<th class="summary-col">Total</th><th class="summary-col">Avg/Yr</th>`;
+  thead.appendChild(hr);
+
+  // Body
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+
+  for (const team of teams) {
+    const league = getLeague(team.abbreviation);
+    const tr = document.createElement('tr');
+
+    // Team cell
+    const teamTd = document.createElement('td');
+    teamTd.className = 'team-col';
+    teamTd.innerHTML = `<div class="team-name">${team.name}</div><div class="team-abbr">${team.abbreviation}</div>`;
+    tr.appendChild(teamTd);
+
+    // Season cells
+    for (const year of seasons) {
+      const td = document.createElement('td');
+      const s = team.seasons[String(year)];
+
+      if (!s) {
+        td.innerHTML = '<div class="cell-inner"><span style="color:#333">—</span></div>';
+        tr.appendChild(td);
+        continue;
+      }
+
+      const bgColor = luckToColor(s.compositeLuck);
+      const textColor = Math.abs(s.compositeLuck) > 5 ? '#111' : '#1a1a2e';
+      const badge = badgeHtml(s.playoffOutcome, league);
+      const luckText = fmtLuck(s.compositeLuck);
+
+      td.innerHTML = `
+        <div class="cell-inner" style="background:${bgColor};color:${textColor}">
+          <span class="luck-value">${luckText}</span>
+          ${badge}
+        </div>
+      `;
+
+      // Tooltip
+      td.addEventListener('mouseenter', (e) => {
+        tooltip.innerHTML = buildTooltip(team.name, year, s);
+        tooltip.style.display = 'block';
+      });
+      td.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
+      });
+      td.addEventListener('mousemove', (e) => {
+        let x = e.clientX + 16;
+        let y = e.clientY + 16;
+        const tw = tooltip.offsetWidth || 260;
+        const th = tooltip.offsetHeight || 200;
+        if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 10;
+        if (y + th > window.innerHeight - 8) y = e.clientY - th - 10;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+      });
+
+      tr.appendChild(td);
+    }
+
+    // Total / Avg cells
+    const totalTd = document.createElement('td');
+    totalTd.className = 'summary-col';
+    const tv = team.totalLuck;
+    totalTd.innerHTML = `<span class="${luckClass(tv)}">${fmtLuck(tv)}</span>`;
+    tr.appendChild(totalTd);
+
+    const avgTd = document.createElement('td');
+    avgTd.className = 'summary-col';
+    const av = team.avgLuck;
+    avgTd.innerHTML = `<span class="${luckClass(av)}">${fmtLuck(av)}</span>`;
+    tr.appendChild(avgTd);
+
+    tbody.appendChild(tr);
+  }
+}
+
+function setSort(key) {
+  if (sortKey === key) {
+    sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    sortKey = key;
+    sortDir = key === 'name' ? 'asc' : 'desc';
+  }
+
+  // Update button states
+  ['total', 'avg', 'name'].forEach(k => {
+    document.getElementById('btn-' + k).classList.remove('active');
+  });
+  const btnMap = { totalLuck: 'total', avgLuck: 'avg', name: 'name' };
+  const activeBtn = document.getElementById('btn-' + btnMap[key]);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  renderTable();
+}
+
+// Load data
+fetch('data.json')
+  .then(r => r.json())
+  .then(data => {
+    allData = data;
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('table-container').style.display = 'block';
+    document.getElementById('footnote').style.display = 'block';
+    renderTable();
+  })
+  .catch(err => {
+    document.getElementById('loading').textContent = 'Error loading data: ' + err.message;
+  });
+</script>
+</body>
+</html>
