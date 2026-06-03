@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MLB Luck Factor 2015–2024</title>
+<title>MLB Luck Factor 2016–2025</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,7 +17,7 @@
 
   header {
     max-width: 1400px;
-    margin: 0 auto 24px;
+    margin: 0 auto 0;
   }
 
   h1 {
@@ -35,12 +35,38 @@
     line-height: 1.5;
   }
 
+  /* ── Tabs ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #1e2333;
+    margin-bottom: 0;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #64748b;
+    padding: 9px 20px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+    letter-spacing: 0.01em;
+  }
+  .tab-btn:hover { color: #cbd5e1; }
+  .tab-btn.active { color: #93c5fd; border-bottom-color: #3b82f6; font-weight: 600; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
   /* ── Controls ── */
   .controls {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 20px;
+    margin-top: 20px;
     align-items: center;
   }
 
@@ -198,6 +224,16 @@
     margin-bottom: 3px;
   }
 
+  /* ── Sortable year headers ── */
+  th.year-col {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s, background 0.15s;
+  }
+  th.year-col:hover { color: #e2e8f0; background: #1e2a3a; }
+  th.year-col.sort-active { color: #93c5fd; background: #162032; }
+  th.year-col .sort-arrow { font-size: 0.65rem; margin-left: 2px; opacity: 0.7; }
+
   /* ── Badges ── */
   .badge {
     display: inline-block;
@@ -239,6 +275,7 @@
   #tooltip .tip-val { font-weight: 600; }
   #tooltip .tip-lucky  { color: #86efac; }
   #tooltip .tip-unlucky { color: #fca5a5; }
+  #tooltip .tip-neutral { color: #94a3b8; }
   #tooltip hr { border: none; border-top: 1px solid #2d3d5a; margin: 6px 0; }
 
   /* ── Summary luck coloring ── */
@@ -263,68 +300,242 @@
     color: #475569;
     line-height: 1.6;
   }
+
+  /* ── Scatter tab ── */
+  .scatter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+    max-width: 1400px;
+    margin: 20px auto 20px;
+  }
+  .scatter-ctrl-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .scatter-ctrl-group label {
+    font-size: 0.72rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .scatter-select {
+    background: #1e2333;
+    border: 1px solid #2d3748;
+    color: #e2e8f0;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    min-width: 210px;
+  }
+  .scatter-select:focus { outline: none; border-color: #3b82f6; }
+
+  .scatter-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #0d1019;
+    border-radius: 10px;
+    border: 1px solid #1e2333;
+    overflow: hidden;
+  }
+
+  #scatter-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>MLB Luck Factor &nbsp;2015–2024</h1>
+  <h1>MLB Luck Factor &nbsp;2016–2025</h1>
   <p class="subtitle">
     Composite of <strong>Pythagorean luck</strong> (actual wins minus run-differential-expected wins)
     and <strong>close-game luck</strong> (≤2-run margin win% vs overall win%). Positive = luckier than
     underlying performance suggests. Values in wins above/below expectation.
   </p>
-
-  <div class="controls">
-    <label>Sort by:</label>
-    <button class="sort-btn active" id="btn-total" onclick="setSort('totalLuck')">Total Luck ▼</button>
-    <button class="sort-btn" id="btn-avg" onclick="setSort('avgLuck')">Avg Luck/Season</button>
-    <button class="sort-btn" id="btn-name" onclick="setSort('name')">Team Name</button>
-  </div>
-
-  <div class="legend">
-    <div class="legend-block">
-      <span class="legend-title">Luck Scale (wins above/below expectation)</span>
-      <div class="color-scale">
-        <span>−10</span>
-        <div class="color-bar"></div>
-        <span>+10</span>
-      </div>
-    </div>
-    <div class="legend-block">
-      <span class="legend-title">Playoff Result</span>
-      <div class="badge-legend">
-        <span class="badge badge-ws">WS</span> Won World Series &nbsp;
-        <span class="badge badge-pennant-al">AL</span>/<span class="badge badge-pennant-nl">NL</span> Pennant &nbsp;
-        <span class="badge badge-lcs">LCS</span> Lost in LCS &nbsp;
-        <span class="badge badge-ds">DS</span> Lost in DS &nbsp;
-        <span class="badge badge-wc">WC</span> Lost in WC
-      </div>
-    </div>
-  </div>
+  <nav class="tab-nav">
+    <button class="tab-btn active" id="tab-btn-table" onclick="switchTab('table')">Luck Table</button>
+    <button class="tab-btn" id="tab-btn-scatter" onclick="switchTab('scatter')">Scatter Plot</button>
+    <button class="tab-btn" id="tab-btn-payroll" onclick="switchTab('payroll')">Payroll vs. Luck</button>
+  </nav>
 </header>
 
-<div id="loading">Loading data…</div>
-<div class="table-wrapper" id="table-container" style="display:none">
-  <table id="luck-table">
-    <thead id="table-head"></thead>
-    <tbody id="table-body"></tbody>
-  </table>
+<!-- Table tab -->
+<div id="tab-table" class="tab-panel active">
+  <div style="max-width:1400px;margin:0 auto;">
+    <div class="controls">
+      <label>Sort by:</label>
+      <button class="sort-btn active" id="btn-total" onclick="setSort('totalLuck')">Total Luck ▼</button>
+      <button class="sort-btn" id="btn-avg" onclick="setSort('avgLuck')">Avg Luck/Season</button>
+      <button class="sort-btn" id="btn-name" onclick="setSort('name')">Team Name</button>
+    </div>
+    <div class="legend">
+      <div class="legend-block">
+        <span class="legend-title">Luck Scale (wins above/below expectation)</span>
+        <div class="color-scale">
+          <span>−10</span>
+          <div class="color-bar"></div>
+          <span>+10</span>
+        </div>
+      </div>
+      <div class="legend-block">
+        <span class="legend-title">Playoff Result</span>
+        <div class="badge-legend">
+          <span class="badge badge-ws">WS</span> Won World Series &nbsp;
+          <span class="badge badge-pennant-al">AL</span>/<span class="badge badge-pennant-nl">NL</span> Pennant &nbsp;
+          <span class="badge badge-lcs">LCS</span> Lost in LCS &nbsp;
+          <span class="badge badge-ds">DS</span> Lost in DS &nbsp;
+          <span class="badge badge-wc">WC</span> Lost in WC
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading">Loading data…</div>
+  <div class="table-wrapper" id="table-container" style="display:none">
+    <table id="luck-table">
+      <thead id="table-head"></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+  <p class="footnote" id="footnote" style="display:none">
+    * 2020 was a shortened 60-game season; luck values are in the same wins-above-expected units but carry higher variance.<br>
+    Pythagorean formula: RS<sup>1.83</sup> / (RS<sup>1.83</sup> + RA<sup>1.83</sup>) × GP. Close-game luck: (close-game win% − overall win%) × close games played.
+    Composite = 0.6 × Pythagorean luck + 0.4 × close-game luck. Data via MLB Stats API.
+  </p>
 </div>
-<p class="footnote" id="footnote" style="display:none">
-  * 2020 was a shortened 60-game season; luck values are in the same wins-above-expected units but carry higher variance.<br>
-  Pythagorean formula: RS<sup>1.83</sup> / (RS<sup>1.83</sup> + RA<sup>1.83</sup>) × GP. Close-game luck: (close-game win% − overall win%) × close games played.
-  Composite = 0.6 × Pythagorean luck + 0.4 × close-game luck. Data via MLB Stats API.
-</p>
+
+<!-- Scatter tab -->
+<div id="tab-scatter" class="tab-panel">
+  <div class="scatter-controls">
+    <div class="scatter-ctrl-group">
+      <label>Season</label>
+      <select id="scatter-year" class="scatter-select" onchange="renderScatter()">
+        <option value="2025" selected>2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020*</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+        <option value="all">All Years (2016–2025)</option>
+      </select>
+    </div>
+    <div class="scatter-ctrl-group">
+      <label>X Axis</label>
+      <select id="scatter-x" class="scatter-select" onchange="renderScatter()">
+        <option value="compositeLuck" selected>Composite Luck (W)</option>
+        <option value="pythLuck">Pythagorean Luck (W)</option>
+        <option value="closeLuck">Close-Game Luck (W)</option>
+        <option value="wins">Wins</option>
+        <option value="losses">Losses</option>
+        <option value="winPct">Win %</option>
+        <option value="runsScored">Runs Scored</option>
+        <option value="runsAllowed">Runs Allowed</option>
+        <option value="runDiff">Run Differential</option>
+        <option value="pythExpectedWins">Pythagorean Expected Wins</option>
+        <option value="closeWinPct">Close-Game Win %</option>
+      </select>
+    </div>
+    <div class="scatter-ctrl-group">
+      <label>Y Axis</label>
+      <select id="scatter-y" class="scatter-select" onchange="renderScatter()">
+        <option value="compositeLuck">Composite Luck (W)</option>
+        <option value="pythLuck">Pythagorean Luck (W)</option>
+        <option value="closeLuck">Close-Game Luck (W)</option>
+        <option value="wins" selected>Wins</option>
+        <option value="losses">Losses</option>
+        <option value="winPct">Win %</option>
+        <option value="runsScored">Runs Scored</option>
+        <option value="runsAllowed">Runs Allowed</option>
+        <option value="runDiff">Run Differential</option>
+        <option value="pythExpectedWins">Pythagorean Expected Wins</option>
+        <option value="closeWinPct">Close-Game Win %</option>
+      </select>
+    </div>
+  </div>
+  <div class="scatter-wrap">
+    <svg id="scatter-svg" viewBox="0 0 940 520" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+</div>
+
+<!-- Payroll vs. Luck tab -->
+<div id="tab-payroll" class="tab-panel">
+  <div class="scatter-controls">
+    <div class="scatter-ctrl-group">
+      <label>Season</label>
+      <select id="payroll-year" class="scatter-select" onchange="renderPayrollScatter()">
+        <option value="all" selected>All Years (2016–2025)</option>
+        <option value="2025">2025</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020*</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+      </select>
+    </div>
+    <div class="scatter-ctrl-group">
+      <label>Luck Metric (Y Axis)</label>
+      <select id="payroll-luck" class="scatter-select" onchange="renderPayrollScatter()">
+        <option value="compositeLuck" selected>Composite Luck (W)</option>
+        <option value="pythLuck">Pythagorean Luck (W)</option>
+        <option value="closeLuck">Close-Game Luck (W)</option>
+      </select>
+    </div>
+    <div class="scatter-ctrl-group">
+      <label>Payroll Scale</label>
+      <select id="payroll-scale" class="scatter-select" onchange="renderPayrollScatter()">
+        <option value="raw" selected>Raw ($M)</option>
+        <option value="relative">Relative to League Avg (%)</option>
+      </select>
+    </div>
+  </div>
+  <div class="scatter-wrap">
+    <svg id="payroll-svg" viewBox="0 0 940 520" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <p class="footnote" id="payroll-footnote">
+    Payroll = Opening Day roster salary. Does higher spending <em>buy</em> luck?
+    If money could purchase luck, we'd expect a positive correlation — test it here.
+    * 2020 payrolls are Opening Day figures (pre-COVID); the season was 60 games.
+    Sources: The Baseball Cube / Spotrac.
+  </p>
+</div>
 
 <div id="tooltip" style="display:none"></div>
 
 <script>
 let allData = null;
+let luckNeutralMap = null;
+let actualSeedingMap = null;
 let sortKey = 'totalLuck';
 let sortDir = 'desc';
 
 const tooltip = document.getElementById('tooltip');
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('tab-btn-' + name).classList.add('active');
+  if (name === 'scatter' && allData) renderScatter();
+  if (name === 'payroll' && allData) renderPayrollScatter();
+}
+
+// ── Color / format helpers ────────────────────────────────────────────────────
 
 function luckToColor(value) {
   const v = Math.max(-10, Math.min(10, value));
@@ -373,8 +584,52 @@ function getLeague(abbr) {
   return AL_TEAMS.has(abbr) ? 'AL' : 'NL';
 }
 
-function buildTooltip(teamName, year, s) {
-  const league = '';
+// ── Luck-neutral standings ────────────────────────────────────────────────────
+
+function getPlayoffSpotsPerLeague(year) {
+  if (year === 2020) return 8;  // expanded pandemic format
+  if (year <= 2021)  return 5;  // 3 div winners + 2 WC
+  return 6;                      // 3 div winners + 3 WC (2022+)
+}
+
+function buildStandingsMap(data, useNeutral) {
+  const map = {};
+  for (const year of data.metadata.seasons) {
+    map[year] = {};
+    const yStr = String(year);
+    const spots = getPlayoffSpotsPerLeague(year);
+    for (const league of ['AL', 'NL']) {
+      const leagueTeams = [];
+      for (const team of data.teams) {
+        const s = team.seasons[yStr];
+        if (!s) continue;
+        if (team.league !== league) continue;
+        const wins = useNeutral ? Math.round(s.wins - s.compositeLuck) : s.wins;
+        leagueTeams.push({ abbr: team.abbreviation, div: team.division, wins, actualWins: s.wins, luck: s.compositeLuck });
+      }
+      // Sort: wins desc, then actual wins desc (tiebreak), then luck asc (more unlucky wins tie)
+      const byWins = (a, b) => b.wins - a.wins || b.actualWins - a.actualWins || a.luck - b.luck;
+      const divWinners = new Set();
+      for (const div of ['E', 'C', 'W']) {
+        const sorted = leagueTeams.filter(t => t.div === div).sort(byWins);
+        if (sorted.length) divWinners.add(sorted[0].abbr);
+      }
+      const wcPool = leagueTeams.filter(t => !divWinners.has(t.abbr)).sort(byWins);
+      const wcQualifiers = new Set(wcPool.slice(0, spots - 3).map(t => t.abbr));
+      for (const t of leagueTeams) {
+        map[year][t.abbr] = {
+          wins: t.wins,
+          seeding: divWinners.has(t.abbr) ? 'DIV' : wcQualifiers.has(t.abbr) ? 'WC' : 'MISSED',
+        };
+      }
+    }
+  }
+  return map;
+}
+
+// ── Tooltip builder ───────────────────────────────────────────────────────────
+
+function buildTooltip(teamName, abbr, year, s) {
   const pctFmt = p => (p * 100).toFixed(1) + '%';
   const overallPct = s.gamesPlayed > 0 ? s.wins / s.gamesPlayed : 0;
   const closePct = s.closeGames > 0 ? s.closeWins / s.closeGames : 0;
@@ -386,6 +641,33 @@ function buildTooltip(teamName, year, s) {
   const pythClass = s.pythLuck >= 0 ? 'tip-lucky' : 'tip-unlucky';
   const closeClass = s.closeLuck >= 0 ? 'tip-lucky' : 'tip-unlucky';
   const compClass = s.compositeLuck >= 0 ? 'tip-lucky' : 'tip-unlucky';
+
+  // Luck-neutral playoff counterfactual
+  let counterfactualHtml = '';
+  const lnEntry = luckNeutralMap?.[year]?.[abbr];
+  const asEntry  = actualSeedingMap?.[year]?.[abbr];
+  if (lnEntry && asEntry) {
+    const nw = lnEntry.wins;
+    const neutralSeeding = lnEntry.seeding;
+    const actualSeeding  = asEntry.seeding;
+    const madeIt = s.playoffOutcome !== 'MISSED';
+
+    let outcomeText, outcomeClass;
+    if (neutralSeeding === 'MISSED') {
+      if (!madeIt) { outcomeText = 'still miss playoffs';    outcomeClass = 'tip-neutral'; }
+      else         { outcomeText = 'would miss playoffs';    outcomeClass = 'tip-unlucky'; }
+    } else {
+      const seedLabel = neutralSeeding === 'DIV' ? 'div winner' : 'WC';
+      if (!madeIt)                               { outcomeText = `would make playoffs (${seedLabel})`;       outcomeClass = 'tip-lucky'; }
+      else if (actualSeeding !== neutralSeeding) { outcomeText = `still playoffs, but as ${seedLabel}`;      outcomeClass = 'tip-neutral'; }
+      else                                       { outcomeText = `still make playoffs (${seedLabel})`;       outcomeClass = 'tip-neutral'; }
+    }
+
+    const yearNote = year === 2020 ? ' <span style="opacity:.6">(2020 expanded)</span>' : '';
+    counterfactualHtml = `
+    <hr>
+    <div class="tip-row"><span class="tip-label">Avg luck → ~${nw}W</span><span class="tip-val ${outcomeClass}">${outcomeText}${yearNote}</span></div>`;
+  }
 
   return `
     <strong>${s.teamNameThatYear} ${year}</strong>
@@ -399,8 +681,275 @@ function buildTooltip(teamName, year, s) {
     <div class="tip-row"><span class="tip-label">Close-game luck</span><span class="tip-val ${closeClass}">${closeSign}${s.closeLuck.toFixed(1)} W</span></div>
     <hr>
     <div class="tip-row"><span class="tip-label">Composite luck</span><span class="tip-val ${compClass}">${compSign}${s.compositeLuck.toFixed(1)} W</span></div>
+    ${counterfactualHtml}
   `.trim();
 }
+
+// ── Scatter plot ──────────────────────────────────────────────────────────────
+
+const AXIS_OPTIONS = {
+  compositeLuck:    'Composite Luck (W)',
+  pythLuck:         'Pythagorean Luck (W)',
+  closeLuck:        'Close-Game Luck (W)',
+  wins:             'Wins',
+  losses:           'Losses',
+  winPct:           'Win %',
+  runsScored:       'Runs Scored',
+  runsAllowed:      'Runs Allowed',
+  runDiff:          'Run Differential',
+  pythExpectedWins: 'Pythagorean Expected Wins',
+  closeWinPct:      'Close-Game Win %',
+};
+
+function getSeasonValue(s, key) {
+  if (key === 'winPct')      return s.gamesPlayed > 0 ? s.wins / s.gamesPlayed : null;
+  if (key === 'runDiff')     return s.runsScored - s.runsAllowed;
+  if (key === 'closeWinPct') return s.closeGames > 0 ? s.closeWins / s.closeGames : null;
+  return s[key] ?? null;
+}
+
+function fmtAxisVal(key, v) {
+  if (v == null) return '—';
+  if (key === 'winPct' || key === 'closeWinPct') return (v * 100).toFixed(1) + '%';
+  if (['compositeLuck','pythLuck','closeLuck'].includes(key)) return (v >= 0 ? '+' : '') + v.toFixed(1);
+  if (Number.isInteger(v)) return String(v);
+  return v.toFixed(1);
+}
+
+// Pearson r + simple linear regression
+function linReg(xs, ys) {
+  const n = xs.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let num = 0, dx2 = 0, dy2 = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx, dy = ys[i] - my;
+    num += dx * dy;
+    dx2 += dx * dx;
+    dy2 += dy * dy;
+  }
+  const slope = dx2 > 0 ? num / dx2 : 0;
+  const intercept = my - slope * mx;
+  const r = (dx2 > 0 && dy2 > 0) ? num / Math.sqrt(dx2 * dy2) : 0;
+  return { slope, intercept, r };
+}
+
+// Playoff outcome colors
+const OUTCOME_COLORS = {
+  WS_CHAMP: '#f59e0b',
+  PENNANT:  '#c0c0c0',
+  LCS:      '#ea580c',
+  DS:       '#3b82f6',
+  WC:       '#a78bfa',
+  MISSED:   '#334155',
+};
+const OUTCOME_LABELS = {
+  WS_CHAMP: 'Won WS',
+  PENNANT:  'Pennant',
+  LCS:      'Lost LCS',
+  DS:       'Lost DS',
+  WC:       'Lost WC',
+  MISSED:   'Missed',
+};
+const OUTCOME_ORDER = ['WS_CHAMP','PENNANT','LCS','DS','WC','MISSED'];
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderScatter() {
+  if (!allData) return;
+
+  const yearVal = document.getElementById('scatter-year').value;
+  const xKey    = document.getElementById('scatter-x').value;
+  const yKey    = document.getElementById('scatter-y').value;
+
+  // Collect points
+  const years = yearVal === 'all' ? allData.metadata.seasons : [parseInt(yearVal)];
+  const points = [];
+  for (const team of allData.teams) {
+    for (const yr of years) {
+      const s = team.seasons[String(yr)];
+      if (!s) continue;
+      const xv = getSeasonValue(s, xKey);
+      const yv = getSeasonValue(s, yKey);
+      if (xv == null || yv == null) continue;
+      points.push({ team, year: yr, s, x: xv, y: yv });
+    }
+  }
+
+  const svgEl = document.getElementById('scatter-svg');
+
+  if (points.length < 2) {
+    svgEl.innerHTML = `<text x="470" y="260" text-anchor="middle" fill="#64748b" font-size="14">No data available</text>`;
+    return;
+  }
+
+  // Ranges with padding
+  const xs = points.map(p => p.x);
+  const ys = points.map(p => p.y);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const xSpan = xMax - xMin || 1;
+  const ySpan = yMax - yMin || 1;
+  const xPad = xSpan * 0.1, yPad = ySpan * 0.12;
+  const xLo = xMin - xPad, xHi = xMax + xPad;
+  const yLo = yMin - yPad, yHi = yMax + yPad;
+
+  // SVG geometry
+  const W = 940, H = 520;
+  const mg = { top: 28, right: 148, bottom: 58, left: 68 };
+  const pw = W - mg.left - mg.right;  // plot width
+  const ph = H - mg.top - mg.bottom;  // plot height
+
+  const sx = x => mg.left + (x - xLo) / (xHi - xLo) * pw;
+  const sy = y => mg.top  + ph - (y - yLo) / (yHi - yLo) * ph;
+
+  // Regression
+  const { slope, intercept, r } = linReg(xs, ys);
+
+  // Nice tick generator
+  function niceTicks(lo, hi, count) {
+    const span = hi - lo;
+    const rough = span / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    const norm = rough / mag;
+    const step = norm < 1.5 ? mag : norm < 3.5 ? 2*mag : norm < 7.5 ? 5*mag : 10*mag;
+    const start = Math.ceil(lo / step) * step;
+    const ticks = [];
+    for (let t = start; t <= hi + 1e-9; t += step) ticks.push(Math.round(t * 1e9) / 1e9);
+    return ticks;
+  }
+
+  const xTicks = niceTicks(xLo, xHi, 7);
+  const yTicks = niceTicks(yLo, yHi, 6);
+
+  // Format tick label
+  function fmtTick(key, v) {
+    if (key === 'winPct' || key === 'closeWinPct') return (v * 100).toFixed(0) + '%';
+    if (['compositeLuck','pythLuck','closeLuck'].includes(key)) return (v >= 0 ? '+' : '') + v.toFixed(1);
+    return Number.isInteger(v) ? String(v) : v.toFixed(1);
+  }
+
+  // Build SVG parts
+  let gridLines = '';
+  for (const t of xTicks) {
+    const x = sx(t);
+    gridLines += `<line x1="${x}" y1="${mg.top}" x2="${x}" y2="${mg.top+ph}" stroke="#1a2235" stroke-width="1"/>`;
+    gridLines += `<text x="${x}" y="${mg.top+ph+16}" text-anchor="middle" fill="#4a5568" font-size="11">${esc(fmtTick(xKey,t))}</text>`;
+  }
+  for (const t of yTicks) {
+    const y = sy(t);
+    gridLines += `<line x1="${mg.left}" y1="${y}" x2="${mg.left+pw}" y2="${y}" stroke="#1a2235" stroke-width="1"/>`;
+    gridLines += `<text x="${mg.left-8}" y="${y+4}" text-anchor="end" fill="#4a5568" font-size="11">${esc(fmtTick(yKey,t))}</text>`;
+  }
+
+  // Zero lines
+  let zeroLines = '';
+  if (xLo < 0 && xHi > 0) {
+    const x = sx(0);
+    zeroLines += `<line x1="${x}" y1="${mg.top}" x2="${x}" y2="${mg.top+ph}" stroke="#2d3d5a" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  }
+  if (yLo < 0 && yHi > 0) {
+    const y = sy(0);
+    zeroLines += `<line x1="${mg.left}" y1="${y}" x2="${mg.left+pw}" y2="${y}" stroke="#2d3d5a" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  }
+
+  // Regression line
+  const rxLo = sx(xLo), rxHi = sx(xHi);
+  const ryLo = sy(slope * xLo + intercept), ryHi = sy(slope * xHi + intercept);
+  const regLine = `<line x1="${rxLo}" y1="${ryLo}" x2="${rxHi}" y2="${ryHi}" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.7"/>`;
+
+  // Axes
+  const axes = `
+    <line x1="${mg.left}" y1="${mg.top}" x2="${mg.left}" y2="${mg.top+ph}" stroke="#2d3748" stroke-width="1.5"/>
+    <line x1="${mg.left}" y1="${mg.top+ph}" x2="${mg.left+pw}" y2="${mg.top+ph}" stroke="#2d3748" stroke-width="1.5"/>
+  `;
+
+  // Axis labels
+  const xLabel = AXIS_OPTIONS[xKey] || xKey;
+  const yLabel = AXIS_OPTIONS[yKey] || yKey;
+  const axisLabels = `
+    <text x="${mg.left + pw/2}" y="${H - 6}" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="500">${esc(xLabel)}</text>
+    <text x="14" y="${mg.top + ph/2}" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="500" transform="rotate(-90,14,${mg.top + ph/2})">${esc(yLabel)}</text>
+  `;
+
+  // r stat box
+  const rSign = r >= 0 ? '+' : '';
+  const rSq = (r * r).toFixed(3);
+  const rStr = rSign + r.toFixed(3);
+  const rBoxX = mg.left + pw + 6;
+  const rBoxY = mg.top;
+  const rStat = `
+    <rect x="${rBoxX}" y="${rBoxY}" width="136" height="48" rx="5" fill="#131926" stroke="#1e2a3a" stroke-width="1"/>
+    <text x="${rBoxX+8}" y="${rBoxY+16}" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.04em">REGRESSION FIT</text>
+    <text x="${rBoxX+8}" y="${rBoxY+32}" fill="#93c5fd" font-size="13" font-weight="700">r = ${esc(rStr)}</text>
+    <text x="${rBoxX+70}" y="${rBoxY+32}" fill="#64748b" font-size="11">r²=${esc(rSq)}</text>
+    <text x="${rBoxX+8}" y="${rBoxY+44}" fill="#475569" font-size="9">n = ${points.length} team-seasons</text>
+  `;
+
+  // Legend (outcome colors)
+  let legend = '';
+  const lgX = rBoxX;
+  let lgY = rBoxY + 62;
+  legend += `<text x="${lgX+8}" y="${lgY}" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.04em">PLAYOFF RESULT</text>`;
+  lgY += 14;
+  for (const outcome of OUTCOME_ORDER) {
+    legend += `<circle cx="${lgX+14}" cy="${lgY+2}" r="5" fill="${esc(OUTCOME_COLORS[outcome])}" opacity="0.9"/>`;
+    legend += `<text x="${lgX+24}" y="${lgY+6}" fill="#94a3b8" font-size="10">${esc(OUTCOME_LABELS[outcome])}</text>`;
+    lgY += 16;
+  }
+
+  // Data points (circles with data-idx for event binding)
+  let circles = '';
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    const cx = sx(p.x).toFixed(1);
+    const cy = sy(p.y).toFixed(1);
+    const fill = OUTCOME_COLORS[p.s.playoffOutcome] || OUTCOME_COLORS.MISSED;
+    const isAllYears = yearVal === 'all';
+    const r = isAllYears ? 4 : 6;
+    // Label only in single-year mode
+    const label = isAllYears ? '' :
+      `<text x="${cx}" y="${parseFloat(cy) - 9}" text-anchor="middle" fill="#94a3b8" font-size="9" pointer-events="none">${esc(p.team.abbreviation)}</text>`;
+    circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${esc(fill)}" stroke="#0d1019" stroke-width="1.2" opacity="0.88" data-idx="${i}" style="cursor:pointer"/>`;
+    circles += label;
+  }
+
+  svgEl.innerHTML = `
+    <rect width="${W}" height="${H}" fill="#0d1019"/>
+    ${gridLines}
+    ${zeroLines}
+    ${regLine}
+    ${axes}
+    ${axisLabels}
+    ${rStat}
+    ${legend}
+    ${circles}
+  `;
+
+  // Attach hover events to circles
+  for (const circle of svgEl.querySelectorAll('circle[data-idx]')) {
+    const p = points[parseInt(circle.dataset.idx)];
+    circle.addEventListener('mouseenter', () => {
+      tooltip.innerHTML = buildTooltip(p.team.name, p.team.abbreviation, p.year, p.s);
+      tooltip.style.display = 'block';
+    });
+    circle.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+    circle.addEventListener('mousemove', (e) => {
+      let x = e.clientX + 16, y = e.clientY + 16;
+      const tw = tooltip.offsetWidth || 260, th = tooltip.offsetHeight || 220;
+      if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 10;
+      if (y + th > window.innerHeight - 8) y = e.clientY - th - 10;
+      tooltip.style.left = x + 'px';
+      tooltip.style.top  = y + 'px';
+    });
+  }
+}
+
+// ── Table rendering ───────────────────────────────────────────────────────────
 
 function renderTable() {
   if (!allData) return;
@@ -415,6 +964,11 @@ function renderTable() {
       va = a.name; vb = b.name;
       return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
     }
+    if (/^\d{4}$/.test(String(sortKey))) {
+      va = a.seasons[String(sortKey)]?.compositeLuck ?? -999;
+      vb = b.seasons[String(sortKey)]?.compositeLuck ?? -999;
+      return sortDir === 'asc' ? va - vb : vb - va;
+    }
     va = a[sortKey] ?? 0;
     vb = b[sortKey] ?? 0;
     return sortDir === 'asc' ? va - vb : vb - va;
@@ -424,8 +978,14 @@ function renderTable() {
   const thead = document.getElementById('table-head');
   thead.innerHTML = '';
   const hr = document.createElement('tr');
-  hr.innerHTML = `<th class="team-col">Team</th>` +
-    seasons.map(y => `<th>${y === 2020 ? '2020*' : y}</th>`).join('') +
+  const yearHeaders = seasons.map(y => {
+    const key = String(y);
+    const isActive = String(sortKey) === key;
+    const label = y === 2020 ? '2020*' : y;
+    const arrow = isActive ? (sortDir === 'desc' ? ' <span class="sort-arrow">▼</span>' : ' <span class="sort-arrow">▲</span>') : '';
+    return `<th class="year-col${isActive ? ' sort-active' : ''}" onclick="setSort(${y})">${label}${arrow}</th>`;
+  }).join('');
+  hr.innerHTML = `<th class="team-col">Team</th>` + yearHeaders +
     `<th class="summary-col">Total</th><th class="summary-col">Avg/Yr</th>`;
   thead.appendChild(hr);
 
@@ -437,13 +997,11 @@ function renderTable() {
     const league = getLeague(team.abbreviation);
     const tr = document.createElement('tr');
 
-    // Team cell
     const teamTd = document.createElement('td');
     teamTd.className = 'team-col';
     teamTd.innerHTML = `<div class="team-name">${team.name}</div><div class="team-abbr">${team.abbreviation}</div>`;
     tr.appendChild(teamTd);
 
-    // Season cells
     for (const year of seasons) {
       const td = document.createElement('td');
       const s = team.seasons[String(year)];
@@ -466,9 +1024,8 @@ function renderTable() {
         </div>
       `;
 
-      // Tooltip
-      td.addEventListener('mouseenter', (e) => {
-        tooltip.innerHTML = buildTooltip(team.name, year, s);
+      td.addEventListener('mouseenter', () => {
+        tooltip.innerHTML = buildTooltip(team.name, team.abbreviation, year, s);
         tooltip.style.display = 'block';
       });
       td.addEventListener('mouseleave', () => {
@@ -488,7 +1045,6 @@ function renderTable() {
       tr.appendChild(td);
     }
 
-    // Total / Avg cells
     const totalTd = document.createElement('td');
     totalTd.className = 'summary-col';
     const tv = team.totalLuck;
@@ -506,37 +1062,277 @@ function renderTable() {
 }
 
 function setSort(key) {
-  if (sortKey === key) {
+  const keyStr = String(key);
+  if (String(sortKey) === keyStr) {
     sortDir = sortDir === 'desc' ? 'asc' : 'desc';
   } else {
     sortKey = key;
-    sortDir = key === 'name' ? 'asc' : 'desc';
+    sortDir = keyStr === 'name' ? 'asc' : 'desc';
   }
 
-  // Update button states
   ['total', 'avg', 'name'].forEach(k => {
     document.getElementById('btn-' + k).classList.remove('active');
   });
   const btnMap = { totalLuck: 'total', avgLuck: 'avg', name: 'name' };
-  const activeBtn = document.getElementById('btn-' + btnMap[key]);
+  const activeBtn = document.getElementById('btn-' + btnMap[keyStr]);
   if (activeBtn) activeBtn.classList.add('active');
 
   renderTable();
 }
 
-// Load data
-fetch('data.json')
-  .then(r => r.json())
-  .then(data => {
-    allData = data;
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('table-container').style.display = 'block';
-    document.getElementById('footnote').style.display = 'block';
-    renderTable();
-  })
-  .catch(err => {
-    document.getElementById('loading').textContent = 'Error loading data: ' + err.message;
-  });
+// ── Payroll data (Opening Day, $M) ───────────────────────────────────────────
+
+const PAYROLL_DATA = {
+  ARI: {2016:98.7,  2017:90.7,  2018:132.5, 2019:123.9, 2020:86.5,  2021:94.4,  2022:77.4,  2023:103.8, 2024:165.6, 2025:184.2},
+  ATL: {2016:84.8,  2017:137.3, 2018:120.5, 2019:113.8, 2020:149.5, 2021:132.5, 2022:175.3, 2023:193.5, 2024:229.3, 2025:215.3},
+  BAL: {2016:147.9, 2017:161.7, 2018:143.6, 2019:72.7,  2020:52.4,  2021:56.2,  2022:41.4,  2023:52.2,  2024:100.5, 2025:164.3},
+  BOS: {2016:199.9, 2017:174.3, 2018:235.6, 2019:222.2, 2020:120.4, 2021:179.5, 2022:201.6, 2023:167.5, 2024:177.8, 2025:198.0},
+  CHC: {2016:167.4, 2017:170.1, 2018:183.5, 2019:210.4, 2020:189.0, 2021:156.5, 2022:141.8, 2023:170.4, 2024:224.5, 2025:192.7},
+  CIN: {2016:93.2,  2017:82.4,  2018:101.2, 2019:126.4, 2020:143.1, 2021:123.6, 2022:113.6, 2023:70.6,  2024:101.6, 2025:116.7},
+  CLE: {2016:98.0,  2017:116.0, 2018:137.3, 2019:119.2, 2020:89.0,  2021:51.3,  2022:57.7,  2023:75.0,  2024:99.8,  2025:99.6},
+  COL: {2016:113.2, 2017:101.5, 2018:141.3, 2019:147.4, 2020:136.4, 2021:110.3, 2022:137.9, 2023:166.3, 2024:142.3, 2025:121.5},
+  CWS: {2016:116.0, 2017:109.6, 2018:72.2,  2019:89.4,  2020:120.9, 2021:127.1, 2022:190.8, 2023:174.9, 2024:129.0, 2025:73.7},
+  DET: {2016:199.5, 2017:180.3, 2018:129.9, 2019:116.5, 2020:96.8,  2021:80.9,  2022:128.6, 2023:105.3, 2024:105.7, 2025:143.7},
+  HOU: {2016:96.6,  2017:127.4, 2018:159.5, 2019:160.8, 2020:212.3, 2021:176.5, 2022:171.6, 2023:180.9, 2024:249.5, 2025:218.6},
+  KC:  {2016:137.6, 2017:132.1, 2018:130.0, 2019:100.7, 2020:83.3,  2021:89.5,  2022:84.6,  2023:75.8,  2024:115.7, 2025:126.4},
+  LAA: {2016:166.8, 2017:144.0, 2018:174.6, 2019:159.4, 2020:176.3, 2021:180.6, 2022:187.6, 2023:204.1, 2024:167.9, 2025:192.4},
+  LAD: {2016:253.6, 2017:188.0, 2018:186.1, 2019:196.7, 2020:189.1, 2021:241.4, 2022:285.5, 2023:217.6, 2024:225.2, 2025:331.0},
+  MIA: {2016:70.5,  2017:115.3, 2018:98.8,  2019:72.4,  2020:47.9,  2021:57.5,  2022:79.5,  2023:81.1,  2024:96.7,  2025:68.0},
+  MIL: {2016:63.0,  2017:61.0,  2018:90.2,  2019:124.8, 2020:97.5,  2021:93.8,  2022:128.6, 2023:108.6, 2024:104.0, 2025:110.8},
+  MIN: {2016:104.6, 2017:100.8, 2018:131.4, 2019:121.3, 2020:127.6, 2021:125.2, 2022:131.0, 2023:141.3, 2024:128.0, 2025:145.9},
+  NYM: {2016:130.6, 2017:176.3, 2018:155.8, 2019:159.0, 2020:142.3, 2021:186.0, 2022:255.9, 2023:334.2, 2024:307.8, 2025:321.6},
+  NYY: {2016:227.9, 2017:170.4, 2018:168.5, 2019:208.1, 2020:214.3, 2021:201.1, 2022:240.3, 2023:269.0, 2024:305.4, 2025:287.5},
+  ATH: {2016:85.8,  2017:70.6,  2018:68.5,  2019:92.3,  2020:94.3,  2021:83.0,  2022:32.5,  2023:43.1,  2024:61.9,  2025:74.0},
+  PHI: {2016:103.3, 2017:87.4,  2018:96.8,  2019:140.7, 2020:152.9, 2021:174.8, 2022:221.7, 2023:232.4, 2024:245.2, 2025:283.2},
+  PIT: {2016:100.0, 2017:94.6,  2018:87.9,  2019:76.6,  2020:42.1,  2021:45.6,  2022:38.6,  2023:60.8,  2024:83.3,  2025:83.8},
+  SD:  {2016:100.5, 2017:34.6,  2018:96.1,  2019:99.2,  2020:140.3, 2021:175.7, 2022:202.2, 2023:237.0, 2024:160.5, 2025:209.3},
+  SEA: {2016:145.0, 2017:155.2, 2018:162.5, 2019:150.9, 2020:70.3,  2021:83.6,  2022:92.7,  2023:129.8, 2024:141.4, 2025:147.9},
+  SF:  {2016:171.5, 2017:176.5, 2018:208.5, 2019:178.3, 2020:145.0, 2021:149.9, 2022:142.3, 2023:175.6, 2024:198.4, 2025:169.9},
+  STL: {2016:149.2, 2017:146.6, 2018:161.0, 2019:162.8, 2020:160.8, 2021:165.0, 2022:150.7, 2023:147.8, 2024:175.5, 2025:135.9},
+  TB:  {2016:64.1,  2017:70.0,  2018:78.2,  2019:60.4,  2020:65.8,  2021:66.8,  2022:75.3,  2023:64.7,  2024:98.5,  2025:88.7},
+  TEX: {2016:161.2, 2017:178.4, 2018:144.5, 2019:127.7, 2020:137.8, 2021:97.8,  2022:135.0, 2023:183.6, 2024:230.0, 2025:214.4},
+  TOR: {2016:140.6, 2017:162.4, 2018:162.7, 2019:112.0, 2020:92.6,  2021:139.6, 2022:164.5, 2023:205.7, 2024:227.2, 2025:243.3},
+  WSH: {2016:146.7, 2017:162.7, 2018:181.6, 2019:161.9, 2020:159.2, 2021:179.6, 2022:114.6, 2023:79.0,  2024:108.3, 2025:113.0},
+};
+
+// ── Payroll scatter ───────────────────────────────────────────────────────────
+
+function renderPayrollScatter() {
+  if (!allData) return;
+
+  const yearVal   = document.getElementById('payroll-year').value;
+  const luckKey   = document.getElementById('payroll-luck').value;
+  const scaleMode = document.getElementById('payroll-scale').value;
+
+  const years = yearVal === 'all' ? allData.metadata.seasons : [parseInt(yearVal)];
+
+  // Compute per-year league-average payrolls for relative mode
+  const leagueAvg = {};
+  for (const yr of allData.metadata.seasons) {
+    const vals = Object.values(PAYROLL_DATA).map(d => d[yr]).filter(v => v != null);
+    leagueAvg[yr] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 1;
+  }
+
+  const points = [];
+  for (const team of allData.teams) {
+    for (const yr of years) {
+      const s = team.seasons[String(yr)];
+      const rawPayroll = PAYROLL_DATA[team.abbreviation]?.[yr];
+      if (!s || rawPayroll == null) continue;
+      const luckVal = s[luckKey];
+      if (luckVal == null) continue;
+
+      const payroll = scaleMode === 'relative'
+        ? ((rawPayroll / leagueAvg[yr]) - 1) * 100
+        : rawPayroll;
+
+      points.push({ team, year: yr, s, x: payroll, y: luckVal, rawPayroll });
+    }
+  }
+
+  const svgEl = document.getElementById('payroll-svg');
+
+  if (points.length < 2) {
+    svgEl.innerHTML = `<text x="470" y="260" text-anchor="middle" fill="#64748b" font-size="14">No data available</text>`;
+    return;
+  }
+
+  const xs = points.map(p => p.x);
+  const ys = points.map(p => p.y);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const xSpan = xMax - xMin || 1;
+  const ySpan = yMax - yMin || 1;
+  const xPad = xSpan * 0.08, yPad = ySpan * 0.12;
+  const xLo = xMin - xPad, xHi = xMax + xPad;
+  const yLo = yMin - yPad, yHi = yMax + yPad;
+
+  const W = 940, H = 520;
+  const mg = { top: 28, right: 148, bottom: 58, left: 72 };
+  const pw = W - mg.left - mg.right;
+  const ph = H - mg.top - mg.bottom;
+
+  const sx = x => mg.left + (x - xLo) / (xHi - xLo) * pw;
+  const sy = y => mg.top  + ph - (y - yLo) / (yHi - yLo) * ph;
+
+  const { slope, intercept, r } = linReg(xs, ys);
+
+  function niceTicks(lo, hi, count) {
+    const span = hi - lo;
+    const rough = span / count;
+    const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    const norm = rough / mag;
+    const step = norm < 1.5 ? mag : norm < 3.5 ? 2*mag : norm < 7.5 ? 5*mag : 10*mag;
+    const start = Math.ceil(lo / step) * step;
+    const ticks = [];
+    for (let t = start; t <= hi + 1e-9; t += step) ticks.push(Math.round(t * 1e9) / 1e9);
+    return ticks;
+  }
+
+  function fmtXTick(v) {
+    if (scaleMode === 'relative') return (v >= 0 ? '+' : '') + v.toFixed(0) + '%';
+    return '$' + v.toFixed(0) + 'M';
+  }
+
+  const xTicks = niceTicks(xLo, xHi, 7);
+  const yTicks = niceTicks(yLo, yHi, 6);
+
+  let gridLines = '';
+  for (const t of xTicks) {
+    const x = sx(t);
+    gridLines += `<line x1="${x}" y1="${mg.top}" x2="${x}" y2="${mg.top+ph}" stroke="#1a2235" stroke-width="1"/>`;
+    gridLines += `<text x="${x}" y="${mg.top+ph+16}" text-anchor="middle" fill="#4a5568" font-size="11">${esc(fmtXTick(t))}</text>`;
+  }
+  for (const t of yTicks) {
+    const y = sy(t);
+    gridLines += `<line x1="${mg.left}" y1="${y}" x2="${mg.left+pw}" y2="${y}" stroke="#1a2235" stroke-width="1"/>`;
+    gridLines += `<text x="${mg.left-8}" y="${y+4}" text-anchor="end" fill="#4a5568" font-size="11">${esc((t >= 0 ? '+' : '') + t.toFixed(1))}</text>`;
+  }
+
+  // Zero lines
+  let zeroLines = '';
+  if (xLo < 0 && xHi > 0) {
+    zeroLines += `<line x1="${sx(0)}" y1="${mg.top}" x2="${sx(0)}" y2="${mg.top+ph}" stroke="#2d3d5a" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  }
+  if (yLo < 0 && yHi > 0) {
+    zeroLines += `<line x1="${mg.left}" y1="${sy(0)}" x2="${mg.left+pw}" y2="${sy(0)}" stroke="#2d3d5a" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  }
+
+  // Regression line
+  const rxLo = sx(xLo), rxHi = sx(xHi);
+  const ryLo = sy(slope * xLo + intercept), ryHi = sy(slope * xHi + intercept);
+  const regLine = `<line x1="${rxLo}" y1="${ryLo}" x2="${rxHi}" y2="${ryHi}" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.7"/>`;
+
+  const axes = `
+    <line x1="${mg.left}" y1="${mg.top}" x2="${mg.left}" y2="${mg.top+ph}" stroke="#2d3748" stroke-width="1.5"/>
+    <line x1="${mg.left}" y1="${mg.top+ph}" x2="${mg.left+pw}" y2="${mg.top+ph}" stroke="#2d3748" stroke-width="1.5"/>
+  `;
+
+  const xAxisLabel = scaleMode === 'relative' ? 'Payroll vs. League Avg (%)' : 'Opening Day Payroll ($M)';
+  const yAxisLabel = {compositeLuck: 'Composite Luck (W)', pythLuck: 'Pythagorean Luck (W)', closeLuck: 'Close-Game Luck (W)'}[luckKey];
+  const axisLabels = `
+    <text x="${mg.left + pw/2}" y="${H - 6}" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="500">${esc(xAxisLabel)}</text>
+    <text x="14" y="${mg.top + ph/2}" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="500" transform="rotate(-90,14,${mg.top + ph/2})">${esc(yAxisLabel)}</text>
+  `;
+
+  // Interpretation string
+  const absR = Math.abs(r);
+  const rInterpret = absR < 0.1 ? 'No correlation' : absR < 0.3 ? 'Weak' : absR < 0.5 ? 'Moderate' : 'Strong';
+  const rDirection = r >= 0 ? 'positive' : 'negative';
+  const rSign = r >= 0 ? '+' : '';
+  const rSq = (r * r).toFixed(3);
+  const rStr = rSign + r.toFixed(3);
+
+  const rBoxX = mg.left + pw + 6;
+  const rBoxY = mg.top;
+  const rStat = `
+    <rect x="${rBoxX}" y="${rBoxY}" width="136" height="64" rx="5" fill="#131926" stroke="#1e2a3a" stroke-width="1"/>
+    <text x="${rBoxX+8}" y="${rBoxY+16}" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.04em">REGRESSION FIT</text>
+    <text x="${rBoxX+8}" y="${rBoxY+32}" fill="#93c5fd" font-size="13" font-weight="700">r = ${esc(rStr)}</text>
+    <text x="${rBoxX+70}" y="${rBoxY+32}" fill="#64748b" font-size="11">r²=${esc(rSq)}</text>
+    <text x="${rBoxX+8}" y="${rBoxY+46}" fill="#475569" font-size="9">${esc(rInterpret)} ${rDirection}</text>
+    <text x="${rBoxX+8}" y="${rBoxY+58}" fill="#475569" font-size="9">n = ${points.length} team-seasons</text>
+  `;
+
+  // Playoff legend
+  let legend = '';
+  const lgX = rBoxX;
+  let lgY = rBoxY + 78;
+  legend += `<text x="${lgX+8}" y="${lgY}" fill="#64748b" font-size="10" font-weight="600" letter-spacing="0.04em">PLAYOFF RESULT</text>`;
+  lgY += 14;
+  for (const outcome of OUTCOME_ORDER) {
+    legend += `<circle cx="${lgX+14}" cy="${lgY+2}" r="5" fill="${esc(OUTCOME_COLORS[outcome])}" opacity="0.9"/>`;
+    legend += `<text x="${lgX+24}" y="${lgY+6}" fill="#94a3b8" font-size="10">${esc(OUTCOME_LABELS[outcome])}</text>`;
+    lgY += 16;
+  }
+
+  // Data points
+  const isAllYears = yearVal === 'all';
+  let circles = '';
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    const cx = sx(p.x).toFixed(1);
+    const cy = sy(p.y).toFixed(1);
+    const fill = OUTCOME_COLORS[p.s.playoffOutcome] || OUTCOME_COLORS.MISSED;
+    const dotR = isAllYears ? 4 : 6;
+    const label = isAllYears ? '' :
+      `<text x="${cx}" y="${parseFloat(cy) - 9}" text-anchor="middle" fill="#94a3b8" font-size="9" pointer-events="none">${esc(p.team.abbreviation)}</text>`;
+    circles += `<circle cx="${cx}" cy="${cy}" r="${dotR}" fill="${esc(fill)}" stroke="#0d1019" stroke-width="1.2" opacity="0.88" data-idx="${i}" style="cursor:pointer"/>`;
+    circles += label;
+  }
+
+  svgEl.innerHTML = `
+    <rect width="${W}" height="${H}" fill="#0d1019"/>
+    ${gridLines}
+    ${zeroLines}
+    ${regLine}
+    ${axes}
+    ${axisLabels}
+    ${rStat}
+    ${legend}
+    ${circles}
+  `;
+
+  // Hover events
+  for (const circle of svgEl.querySelectorAll('circle[data-idx]')) {
+    const p = points[parseInt(circle.dataset.idx)];
+    const payrollLabel = scaleMode === 'relative'
+      ? (p.x >= 0 ? '+' : '') + p.x.toFixed(1) + '% vs avg ($' + p.rawPayroll.toFixed(0) + 'M)'
+      : '$' + p.rawPayroll.toFixed(0) + 'M';
+    const luckLabel = {compositeLuck: 'Composite luck', pythLuck: 'Pyth luck', closeLuck: 'Close-game luck'}[luckKey];
+    const luckSign = p.y >= 0 ? '+' : '';
+    circle.addEventListener('mouseenter', () => {
+      tooltip.innerHTML = `
+        <strong>${esc(p.s.teamNameThatYear)} ${p.year}</strong>
+        <div class="tip-row"><span class="tip-label">Payroll</span><span class="tip-val">${esc(payrollLabel)}</span></div>
+        <div class="tip-row"><span class="tip-label">${esc(luckLabel)}</span><span class="tip-val ${p.y >= 0 ? 'tip-lucky' : 'tip-unlucky'}">${luckSign}${p.y.toFixed(1)} W</span></div>
+      `.trim();
+      tooltip.style.display = 'block';
+    });
+    circle.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+    circle.addEventListener('mousemove', (e) => {
+      let x = e.clientX + 16, y = e.clientY + 16;
+      const tw = tooltip.offsetWidth || 220, th = tooltip.offsetHeight || 80;
+      if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 10;
+      if (y + th > window.innerHeight - 8) y = e.clientY - th - 10;
+      tooltip.style.left = x + 'px';
+      tooltip.style.top  = y + 'px';
+    });
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+
+(function() {
+  const data = {"metadata":{"generated":"2026-04-05T20:57:32.826356Z","seasons":[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025]},"teams":[{"id":109,"name":"Arizona Diamondbacks","abbreviation":"ARI","league":"NL","division":"W","totalLuck":-17.14,"avgLuck":-1.71,"seasons":{"2016":{"wins":69,"losses":93,"gamesPlayed":162,"runsScored":752,"runsAllowed":890,"pythExpectedWins":68.61,"pythLuck":0.39,"closeWins":34,"closeLosses":40,"closeGames":74,"closeLuck":2.48,"compositeLuck":1.23,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"},"2017":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":812,"runsAllowed":659,"pythExpectedWins":96.29,"pythLuck":-3.29,"closeWins":42,"closeLosses":32,"closeGames":74,"closeLuck":-0.48,"compositeLuck":-2.17,"playoffOutcome":"DS","teamNameThatYear":"Arizona Diamondbacks"},"2018":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":693,"runsAllowed":644,"pythExpectedWins":86.43,"pythLuck":-4.43,"closeWins":33,"closeLosses":42,"closeGames":75,"closeLuck":-4.96,"compositeLuck":-4.64,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"},"2019":{"wins":85,"losses":77,"gamesPlayed":162,"runsScored":813,"runsAllowed":743,"pythExpectedWins":87.66,"pythLuck":-2.66,"closeWins":39,"closeLosses":37,"closeGames":76,"closeLuck":-0.88,"compositeLuck":-1.95,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"},"2020":{"wins":25,"losses":35,"gamesPlayed":60,"runsScored":269,"runsAllowed":295,"pythExpectedWins":27.47,"pythLuck":-2.47,"closeWins":10,"closeLosses":12,"closeGames":22,"closeLuck":0.83,"compositeLuck":-1.15,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"},"2021":{"wins":52,"losses":110,"gamesPlayed":162,"runsScored":679,"runsAllowed":893,"pythExpectedWins":61.11,"pythLuck":-9.11,"closeWins":23,"closeLosses":50,"closeGames":73,"closeLuck":-0.43,"compositeLuck":-5.64,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"},"2022":{"wins":74,"losses":88,"gamesPlayed":162,"runsScored":702,"runsAllowed":740,"pythExpectedWins":77.1,"pythLuck":-3.1,"closeWins":30,"closeLosses":44,"closeGames":74,"closeLuck":-3.8,"compositeLuck":-3.38,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"},"2023":{"wins":84,"losses":78,"gamesPlayed":162,"runsScored":746,"runsAllowed":761,"pythExpectedWins":79.52,"pythLuck":4.48,"closeWins":40,"closeLosses":36,"closeGames":76,"closeLuck":0.59,"compositeLuck":2.92,"playoffOutcome":"PENNANT","teamNameThatYear":"Arizona Diamondbacks"},"2024":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":886,"runsAllowed":788,"pythExpectedWins":89.65,"pythLuck":-0.65,"closeWins":39,"closeLosses":34,"closeGames":73,"closeLuck":-1.1,"compositeLuck":-0.83,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"},"2025":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":791,"runsAllowed":785,"pythExpectedWins":81.56,"pythLuck":-1.56,"closeWins":39,"closeLosses":43,"closeGames":82,"closeLuck":-1.49,"compositeLuck":-1.53,"playoffOutcome":"MISSED","teamNameThatYear":"Arizona Diamondbacks"}}},{"id":133,"name":"Athletics","abbreviation":"ATH","league":"AL","division":"W","totalLuck":12.85,"avgLuck":1.28,"seasons":{"2016":{"wins":69,"losses":93,"gamesPlayed":162,"runsScored":653,"runsAllowed":761,"pythExpectedWins":69.73,"pythLuck":-0.73,"closeWins":35,"closeLosses":42,"closeGames":77,"closeLuck":2.2,"compositeLuck":0.44,"playoffOutcome":"MISSED","teamNameThatYear":"Oakland Athletics"},"2017":{"wins":75,"losses":87,"gamesPlayed":162,"runsScored":739,"runsAllowed":826,"pythExpectedWins":72.78,"pythLuck":2.22,"closeWins":36,"closeLosses":36,"closeGames":72,"closeLuck":2.67,"compositeLuck":2.4,"playoffOutcome":"MISSED","teamNameThatYear":"Oakland Athletics"},"2018":{"wins":97,"losses":65,"gamesPlayed":162,"runsScored":813,"runsAllowed":674,"pythExpectedWins":94.76,"pythLuck":2.24,"closeWins":46,"closeLosses":29,"closeGames":75,"closeLuck":1.09,"compositeLuck":1.78,"playoffOutcome":"WC","teamNameThatYear":"Oakland Athletics"},"2019":{"wins":97,"losses":65,"gamesPlayed":162,"runsScored":845,"runsAllowed":680,"pythExpectedWins":96.89,"pythLuck":0.11,"closeWins":48,"closeLosses":35,"closeGames":83,"closeLuck":-1.7,"compositeLuck":-0.61,"playoffOutcome":"WC","teamNameThatYear":"Oakland Athletics"},"2020":{"wins":36,"losses":24,"gamesPlayed":60,"runsScored":274,"runsAllowed":232,"pythExpectedWins":34.53,"pythLuck":1.47,"closeWins":18,"closeLosses":10,"closeGames":28,"closeLuck":1.2,"compositeLuck":1.36,"playoffOutcome":"DS","teamNameThatYear":"Oakland Athletics"},"2021":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":743,"runsAllowed":687,"pythExpectedWins":86.8,"pythLuck":-0.8,"closeWins":37,"closeLosses":43,"closeGames":80,"closeLuck":-5.47,"compositeLuck":-2.67,"playoffOutcome":"MISSED","teamNameThatYear":"Oakland Athletics"},"2022":{"wins":60,"losses":102,"gamesPlayed":162,"runsScored":568,"runsAllowed":770,"pythExpectedWins":59.01,"pythLuck":0.99,"closeWins":36,"closeLosses":44,"closeGames":80,"closeLuck":6.37,"compositeLuck":3.14,"playoffOutcome":"MISSED","teamNameThatYear":"Oakland Athletics"},"2023":{"wins":50,"losses":112,"gamesPlayed":162,"runsScored":585,"runsAllowed":924,"pythExpectedWins":48.97,"pythLuck":1.03,"closeWins":26,"closeLosses":41,"closeGames":67,"closeLuck":5.32,"compositeLuck":2.75,"playoffOutcome":"MISSED","teamNameThatYear":"Oakland Athletics"},"2024":{"wins":69,"losses":93,"gamesPlayed":162,"runsScored":643,"runsAllowed":764,"pythExpectedWins":68.33,"pythLuck":0.67,"closeWins":40,"closeLosses":44,"closeGames":84,"closeLuck":4.22,"compositeLuck":2.09,"playoffOutcome":"MISSED","teamNameThatYear":"Oakland Athletics"},"2025":{"wins":76,"losses":86,"gamesPlayed":162,"runsScored":733,"runsAllowed":817,"pythExpectedWins":72.99,"pythLuck":3.01,"closeWins":30,"closeLosses":32,"closeGames":62,"closeLuck":0.91,"compositeLuck":2.17,"playoffOutcome":"MISSED","teamNameThatYear":"Athletics"}}},{"id":144,"name":"Atlanta Braves","abbreviation":"ATL","league":"NL","division":"E","totalLuck":-9.73,"avgLuck":-0.97,"seasons":{"2016":{"wins":68,"losses":93,"gamesPlayed":161,"runsScored":649,"runsAllowed":779,"pythExpectedWins":67.18,"pythLuck":0.82,"closeWins":36,"closeLosses":43,"closeGames":79,"closeLuck":2.63,"compositeLuck":1.54,"playoffOutcome":"MISSED","teamNameThatYear":"Atlanta Braves"},"2017":{"wins":72,"losses":90,"gamesPlayed":162,"runsScored":732,"runsAllowed":821,"pythExpectedWins":72.53,"pythLuck":-0.53,"closeWins":34,"closeLosses":37,"closeGames":71,"closeLuck":2.44,"compositeLuck":0.66,"playoffOutcome":"MISSED","teamNameThatYear":"Atlanta Braves"},"2018":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":759,"runsAllowed":657,"pythExpectedWins":91.63,"pythLuck":-1.63,"closeWins":36,"closeLosses":29,"closeGames":65,"closeLuck":-0.11,"compositeLuck":-1.02,"playoffOutcome":"DS","teamNameThatYear":"Atlanta Braves"},"2019":{"wins":97,"losses":65,"gamesPlayed":162,"runsScored":855,"runsAllowed":743,"pythExpectedWins":91.35,"pythLuck":5.65,"closeWins":46,"closeLosses":30,"closeGames":76,"closeLuck":0.49,"compositeLuck":3.59,"playoffOutcome":"DS","teamNameThatYear":"Atlanta Braves"},"2020":{"wins":35,"losses":25,"gamesPlayed":60,"runsScored":348,"runsAllowed":288,"pythExpectedWins":35.14,"pythLuck":-0.14,"closeWins":14,"closeLosses":7,"closeGames":21,"closeLuck":1.75,"compositeLuck":0.62,"playoffOutcome":"LCS","teamNameThatYear":"Atlanta Braves"},"2021":{"wins":88,"losses":73,"gamesPlayed":161,"runsScored":790,"runsAllowed":656,"pythExpectedWins":94.06,"pythLuck":-6.06,"closeWins":42,"closeLosses":49,"closeGames":91,"closeLuck":-7.74,"compositeLuck":-6.73,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Atlanta Braves"},"2022":{"wins":101,"losses":61,"gamesPlayed":162,"runsScored":789,"runsAllowed":609,"pythExpectedWins":99.84,"pythLuck":1.16,"closeWins":42,"closeLosses":28,"closeGames":70,"closeLuck":-1.64,"compositeLuck":0.04,"playoffOutcome":"DS","teamNameThatYear":"Atlanta Braves"},"2023":{"wins":104,"losses":58,"gamesPlayed":162,"runsScored":947,"runsAllowed":716,"pythExpectedWins":101.28,"pythLuck":2.72,"closeWins":42,"closeLosses":29,"closeGames":71,"closeLuck":-3.58,"compositeLuck":0.2,"playoffOutcome":"DS","teamNameThatYear":"Atlanta Braves"},"2024":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":704,"runsAllowed":607,"pythExpectedWins":91.92,"pythLuck":-2.92,"closeWins":34,"closeLosses":39,"closeGames":73,"closeLuck":-6.1,"compositeLuck":-4.19,"playoffOutcome":"WC","teamNameThatYear":"Atlanta Braves"},"2025":{"wins":76,"losses":86,"gamesPlayed":162,"runsScored":724,"runsAllowed":734,"pythExpectedWins":79.98,"pythLuck":-3.98,"closeWins":31,"closeLosses":46,"closeGames":77,"closeLuck":-5.12,"compositeLuck":-4.44,"playoffOutcome":"MISSED","teamNameThatYear":"Atlanta Braves"}}},{"id":110,"name":"Baltimore Orioles","abbreviation":"BAL","league":"AL","division":"E","totalLuck":11.07,"avgLuck":1.11,"seasons":{"2016":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":744,"runsAllowed":715,"pythExpectedWins":83.95,"pythLuck":5.05,"closeWins":42,"closeLosses":32,"closeGames":74,"closeLuck":1.35,"compositeLuck":3.57,"playoffOutcome":"WC","teamNameThatYear":"Baltimore Orioles"},"2017":{"wins":75,"losses":87,"gamesPlayed":162,"runsScored":743,"runsAllowed":841,"pythExpectedWins":71.86,"pythLuck":3.14,"closeWins":40,"closeLosses":33,"closeGames":73,"closeLuck":6.2,"compositeLuck":4.36,"playoffOutcome":"MISSED","teamNameThatYear":"Baltimore Orioles"},"2018":{"wins":47,"losses":115,"gamesPlayed":162,"runsScored":622,"runsAllowed":892,"pythExpectedWins":55.21,"pythLuck":-8.21,"closeWins":22,"closeLosses":51,"closeGames":73,"closeLuck":0.82,"compositeLuck":-4.6,"playoffOutcome":"MISSED","teamNameThatYear":"Baltimore Orioles"},"2019":{"wins":54,"losses":108,"gamesPlayed":162,"runsScored":729,"runsAllowed":981,"pythExpectedWins":59.52,"pythLuck":-5.52,"closeWins":20,"closeLosses":40,"closeGames":60,"closeLuck":0.0,"compositeLuck":-3.31,"playoffOutcome":"MISSED","teamNameThatYear":"Baltimore Orioles"},"2020":{"wins":25,"losses":35,"gamesPlayed":60,"runsScored":274,"runsAllowed":294,"pythExpectedWins":28.07,"pythLuck":-3.07,"closeWins":9,"closeLosses":17,"closeGames":26,"closeLuck":-1.83,"compositeLuck":-2.57,"playoffOutcome":"MISSED","teamNameThatYear":"Baltimore Orioles"},"2021":{"wins":52,"losses":110,"gamesPlayed":162,"runsScored":659,"runsAllowed":956,"pythExpectedWins":54.44,"pythLuck":-2.44,"closeWins":24,"closeLosses":39,"closeGames":63,"closeLuck":3.78,"compositeLuck":0.05,"playoffOutcome":"MISSED","teamNameThatYear":"Baltimore Orioles"},"2022":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":674,"runsAllowed":688,"pythExpectedWins":79.48,"pythLuck":3.52,"closeWins":43,"closeLosses":40,"closeGames":83,"closeLuck":0.48,"compositeLuck":2.3,"playoffOutcome":"MISSED","teamNameThatYear":"Baltimore Orioles"},"2023":{"wins":101,"losses":61,"gamesPlayed":162,"runsScored":807,"runsAllowed":678,"pythExpectedWins":93.8,"pythLuck":7.2,"closeWins":47,"closeLosses":24,"closeGames":71,"closeLuck":2.73,"compositeLuck":5.41,"playoffOutcome":"DS","teamNameThatYear":"Baltimore Orioles"},"2024":{"wins":91,"losses":71,"gamesPlayed":162,"runsScored":786,"runsAllowed":699,"pythExpectedWins":89.66,"pythLuck":1.34,"closeWins":41,"closeLosses":33,"closeGames":74,"closeLuck":-0.57,"compositeLuck":0.58,"playoffOutcome":"WC","teamNameThatYear":"Baltimore Orioles"},"2025":{"wins":75,"losses":87,"gamesPlayed":162,"runsScored":677,"runsAllowed":788,"pythExpectedWins":69.82,"pythLuck":5.18,"closeWins":36,"closeLosses":30,"closeGames":66,"closeLuck":5.44,"compositeLuck":5.28,"playoffOutcome":"MISSED","teamNameThatYear":"Baltimore Orioles"}}},{"id":111,"name":"Boston Red Sox","abbreviation":"BOS","league":"AL","division":"E","totalLuck":-5.77,"avgLuck":-0.58,"seasons":{"2016":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":878,"runsAllowed":694,"pythExpectedWins":98.17,"pythLuck":-5.17,"closeWins":38,"closeLosses":39,"closeGames":77,"closeLuck":-6.2,"compositeLuck":-5.58,"playoffOutcome":"DS","teamNameThatYear":"Boston Red Sox"},"2017":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":785,"runsAllowed":668,"pythExpectedWins":92.88,"pythLuck":0.12,"closeWins":32,"closeLosses":31,"closeGames":63,"closeLuck":-4.17,"compositeLuck":-1.6,"playoffOutcome":"DS","teamNameThatYear":"Boston Red Sox"},"2018":{"wins":108,"losses":54,"gamesPlayed":162,"runsScored":876,"runsAllowed":647,"pythExpectedWins":102.9,"pythLuck":5.1,"closeWins":42,"closeLosses":21,"closeGames":63,"closeLuck":0.0,"compositeLuck":3.06,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Boston Red Sox"},"2019":{"wins":84,"losses":78,"gamesPlayed":162,"runsScored":901,"runsAllowed":828,"pythExpectedWins":87.25,"pythLuck":-3.25,"closeWins":33,"closeLosses":34,"closeGames":67,"closeLuck":-1.74,"compositeLuck":-2.65,"playoffOutcome":"MISSED","teamNameThatYear":"Boston Red Sox"},"2020":{"wins":24,"losses":36,"gamesPlayed":60,"runsScored":292,"runsAllowed":351,"pythExpectedWins":25.0,"pythLuck":-1.0,"closeWins":11,"closeLosses":13,"closeGames":24,"closeLuck":1.4,"compositeLuck":-0.04,"playoffOutcome":"MISSED","teamNameThatYear":"Boston Red Sox"},"2021":{"wins":92,"losses":70,"gamesPlayed":162,"runsScored":829,"runsAllowed":749,"pythExpectedWins":88.5,"pythLuck":3.5,"closeWins":42,"closeLosses":31,"closeGames":73,"closeLuck":0.54,"compositeLuck":2.32,"playoffOutcome":"LCS","teamNameThatYear":"Boston Red Sox"},"2022":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":735,"runsAllowed":787,"pythExpectedWins":75.94,"pythLuck":2.06,"closeWins":39,"closeLosses":40,"closeGames":79,"closeLuck":0.96,"compositeLuck":1.62,"playoffOutcome":"MISSED","teamNameThatYear":"Boston Red Sox"},"2023":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":772,"runsAllowed":776,"pythExpectedWins":80.62,"pythLuck":-2.62,"closeWins":32,"closeLosses":37,"closeGames":69,"closeLuck":-1.22,"compositeLuck":-2.06,"playoffOutcome":"MISSED","teamNameThatYear":"Boston Red Sox"},"2024":{"wins":81,"losses":81,"gamesPlayed":162,"runsScored":751,"runsAllowed":747,"pythExpectedWins":81.4,"pythLuck":-0.4,"closeWins":33,"closeLosses":27,"closeGames":60,"closeLuck":3.0,"compositeLuck":0.96,"playoffOutcome":"MISSED","teamNameThatYear":"Boston Red Sox"},"2025":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":786,"runsAllowed":676,"pythExpectedWins":92.1,"pythLuck":-3.1,"closeWins":43,"closeLosses":35,"closeGames":78,"closeLuck":0.15,"compositeLuck":-1.8,"playoffOutcome":"WC","teamNameThatYear":"Boston Red Sox"}}},{"id":112,"name":"Chicago Cubs","abbreviation":"CHC","league":"NL","division":"C","totalLuck":-23.87,"avgLuck":-2.39,"seasons":{"2016":{"wins":103,"losses":58,"gamesPlayed":162,"runsScored":808,"runsAllowed":556,"pythExpectedWins":107.67,"pythLuck":-4.67,"closeWins":38,"closeLosses":33,"closeGames":71,"closeLuck":-7.14,"compositeLuck":-5.66,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Chicago Cubs"},"2017":{"wins":92,"losses":70,"gamesPlayed":162,"runsScored":822,"runsAllowed":695,"pythExpectedWins":93.34,"pythLuck":-1.34,"closeWins":39,"closeLosses":35,"closeGames":74,"closeLuck":-3.02,"compositeLuck":-2.01,"playoffOutcome":"LCS","teamNameThatYear":"Chicago Cubs"},"2018":{"wins":95,"losses":68,"gamesPlayed":163,"runsScored":761,"runsAllowed":645,"pythExpectedWins":93.74,"pythLuck":1.26,"closeWins":39,"closeLosses":33,"closeGames":72,"closeLuck":-2.96,"compositeLuck":-0.43,"playoffOutcome":"WC","teamNameThatYear":"Chicago Cubs"},"2019":{"wins":84,"losses":78,"gamesPlayed":162,"runsScored":814,"runsAllowed":717,"pythExpectedWins":90.36,"pythLuck":-6.36,"closeWins":29,"closeLosses":45,"closeGames":74,"closeLuck":-9.37,"compositeLuck":-7.56,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago Cubs"},"2020":{"wins":34,"losses":26,"gamesPlayed":60,"runsScored":265,"runsAllowed":240,"pythExpectedWins":32.71,"pythLuck":1.29,"closeWins":15,"closeLosses":11,"closeGames":26,"closeLuck":0.27,"compositeLuck":0.88,"playoffOutcome":"WC","teamNameThatYear":"Chicago Cubs"},"2021":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":705,"runsAllowed":839,"pythExpectedWins":68.21,"pythLuck":2.79,"closeWins":37,"closeLosses":37,"closeGames":74,"closeLuck":4.57,"compositeLuck":3.5,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago Cubs"},"2022":{"wins":74,"losses":88,"gamesPlayed":162,"runsScored":657,"runsAllowed":731,"pythExpectedWins":73.11,"pythLuck":0.89,"closeWins":43,"closeLosses":48,"closeGames":91,"closeLuck":1.43,"compositeLuck":1.11,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago Cubs"},"2023":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":819,"runsAllowed":723,"pythExpectedWins":90.2,"pythLuck":-7.2,"closeWins":30,"closeLosses":41,"closeGames":71,"closeLuck":-6.38,"compositeLuck":-6.87,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago Cubs"},"2024":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":736,"runsAllowed":669,"pythExpectedWins":88.06,"pythLuck":-5.06,"closeWins":37,"closeLosses":40,"closeGames":77,"closeLuck":-2.45,"compositeLuck":-4.02,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago Cubs"},"2025":{"wins":92,"losses":70,"gamesPlayed":162,"runsScored":793,"runsAllowed":649,"pythExpectedWins":95.69,"pythLuck":-3.69,"closeWins":36,"closeLosses":30,"closeGames":66,"closeLuck":-1.48,"compositeLuck":-2.81,"playoffOutcome":"DS","teamNameThatYear":"Chicago Cubs"}}},{"id":145,"name":"Chicago White Sox","abbreviation":"CWS","league":"AL","division":"C","totalLuck":-11.39,"avgLuck":-1.14,"seasons":{"2016":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":686,"runsAllowed":715,"pythExpectedWins":77.93,"pythLuck":0.07,"closeWins":40,"closeLosses":46,"closeGames":86,"closeLuck":-1.41,"compositeLuck":-0.52,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"},"2017":{"wins":67,"losses":95,"gamesPlayed":162,"runsScored":706,"runsAllowed":820,"pythExpectedWins":69.97,"pythLuck":-2.97,"closeWins":31,"closeLosses":39,"closeGames":70,"closeLuck":2.05,"compositeLuck":-0.96,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"},"2018":{"wins":62,"losses":100,"gamesPlayed":162,"runsScored":656,"runsAllowed":848,"pythExpectedWins":62.32,"pythLuck":-0.32,"closeWins":26,"closeLosses":40,"closeGames":66,"closeLuck":0.74,"compositeLuck":0.1,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"},"2019":{"wins":72,"losses":89,"gamesPlayed":161,"runsScored":708,"runsAllowed":832,"pythExpectedWins":68.7,"pythLuck":3.3,"closeWins":34,"closeLosses":35,"closeGames":69,"closeLuck":3.14,"compositeLuck":3.24,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"},"2020":{"wins":35,"losses":25,"gamesPlayed":60,"runsScored":306,"runsAllowed":246,"pythExpectedWins":35.91,"pythLuck":-0.91,"closeWins":11,"closeLosses":11,"closeGames":22,"closeLuck":-1.83,"compositeLuck":-1.28,"playoffOutcome":"WC","teamNameThatYear":"Chicago White Sox"},"2021":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":796,"runsAllowed":636,"pythExpectedWins":97.4,"pythLuck":-4.4,"closeWins":34,"closeLosses":36,"closeGames":70,"closeLuck":-6.19,"compositeLuck":-5.12,"playoffOutcome":"DS","teamNameThatYear":"Chicago White Sox"},"2022":{"wins":81,"losses":81,"gamesPlayed":162,"runsScored":686,"runsAllowed":717,"pythExpectedWins":77.73,"pythLuck":3.27,"closeWins":46,"closeLosses":29,"closeGames":75,"closeLuck":8.5,"compositeLuck":5.36,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"},"2023":{"wins":61,"losses":101,"gamesPlayed":162,"runsScored":641,"runsAllowed":841,"pythExpectedWins":61.28,"pythLuck":-0.28,"closeWins":29,"closeLosses":42,"closeGames":71,"closeLuck":2.27,"compositeLuck":0.74,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"},"2024":{"wins":41,"losses":121,"gamesPlayed":162,"runsScored":507,"runsAllowed":813,"pythExpectedWins":48.03,"pythLuck":-7.03,"closeWins":20,"closeLosses":53,"closeGames":73,"closeLuck":1.52,"compositeLuck":-3.61,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"},"2025":{"wins":60,"losses":102,"gamesPlayed":162,"runsScored":647,"runsAllowed":742,"pythExpectedWins":70.9,"pythLuck":-10.9,"closeWins":23,"closeLosses":58,"closeGames":81,"closeLuck":-7.0,"compositeLuck":-9.34,"playoffOutcome":"MISSED","teamNameThatYear":"Chicago White Sox"}}},{"id":113,"name":"Cincinnati Reds","abbreviation":"CIN","league":"NL","division":"C","totalLuck":-10.87,"avgLuck":-1.09,"seasons":{"2016":{"wins":68,"losses":94,"gamesPlayed":162,"runsScored":716,"runsAllowed":854,"pythExpectedWins":68.05,"pythLuck":-0.05,"closeWins":29,"closeLosses":39,"closeGames":68,"closeLuck":0.46,"compositeLuck":0.15,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2017":{"wins":68,"losses":94,"gamesPlayed":162,"runsScored":753,"runsAllowed":869,"pythExpectedWins":70.44,"pythLuck":-2.44,"closeWins":28,"closeLosses":38,"closeGames":66,"closeLuck":0.3,"compositeLuck":-1.34,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2018":{"wins":67,"losses":95,"gamesPlayed":162,"runsScored":696,"runsAllowed":819,"pythExpectedWins":69.03,"pythLuck":-2.03,"closeWins":27,"closeLosses":42,"closeGames":69,"closeLuck":-1.54,"compositeLuck":-1.83,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2019":{"wins":75,"losses":87,"gamesPlayed":162,"runsScored":701,"runsAllowed":711,"pythExpectedWins":79.95,"pythLuck":-4.95,"closeWins":37,"closeLosses":52,"closeGames":89,"closeLuck":-4.2,"compositeLuck":-4.65,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2020":{"wins":31,"losses":29,"gamesPlayed":60,"runsScored":243,"runsAllowed":243,"pythExpectedWins":30.0,"pythLuck":1.0,"closeWins":12,"closeLosses":13,"closeGames":25,"closeLuck":-0.92,"compositeLuck":0.23,"playoffOutcome":"WC","teamNameThatYear":"Cincinnati Reds"},"2021":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":786,"runsAllowed":760,"pythExpectedWins":83.49,"pythLuck":-0.49,"closeWins":37,"closeLosses":36,"closeGames":73,"closeLuck":-0.4,"compositeLuck":-0.45,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2022":{"wins":62,"losses":100,"gamesPlayed":162,"runsScored":648,"runsAllowed":815,"pythExpectedWins":64.25,"pythLuck":-2.25,"closeWins":30,"closeLosses":37,"closeGames":67,"closeLuck":4.36,"compositeLuck":0.39,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2023":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":783,"runsAllowed":821,"pythExpectedWins":77.49,"pythLuck":4.51,"closeWins":49,"closeLosses":40,"closeGames":89,"closeLuck":3.95,"compositeLuck":4.29,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2024":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":699,"runsAllowed":694,"pythExpectedWins":81.53,"pythLuck":-4.53,"closeWins":25,"closeLosses":42,"closeGames":67,"closeLuck":-6.85,"compositeLuck":-5.46,"playoffOutcome":"MISSED","teamNameThatYear":"Cincinnati Reds"},"2025":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":716,"runsAllowed":681,"pythExpectedWins":84.71,"pythLuck":-1.71,"closeWins":36,"closeLosses":40,"closeGames":76,"closeLuck":-2.94,"compositeLuck":-2.2,"playoffOutcome":"WC","teamNameThatYear":"Cincinnati Reds"}}},{"id":114,"name":"Cleveland Guardians","abbreviation":"CLE","league":"AL","division":"C","totalLuck":0.45,"avgLuck":0.05,"seasons":{"2016":{"wins":94,"losses":67,"gamesPlayed":161,"runsScored":777,"runsAllowed":676,"pythExpectedWins":90.7,"pythLuck":3.3,"closeWins":38,"closeLosses":25,"closeGames":63,"closeLuck":1.22,"compositeLuck":2.47,"playoffOutcome":"PENNANT","teamNameThatYear":"Cleveland Indians"},"2017":{"wins":102,"losses":60,"gamesPlayed":162,"runsScored":818,"runsAllowed":564,"pythExpectedWins":107.54,"pythLuck":-5.54,"closeWins":35,"closeLosses":33,"closeGames":68,"closeLuck":-7.81,"compositeLuck":-6.45,"playoffOutcome":"DS","teamNameThatYear":"Cleveland Indians"},"2018":{"wins":91,"losses":71,"gamesPlayed":162,"runsScored":818,"runsAllowed":648,"pythExpectedWins":98.01,"pythLuck":-7.01,"closeWins":35,"closeLosses":38,"closeGames":73,"closeLuck":-6.01,"compositeLuck":-6.61,"playoffOutcome":"DS","teamNameThatYear":"Cleveland Indians"},"2019":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":769,"runsAllowed":657,"pythExpectedWins":92.59,"pythLuck":0.41,"closeWins":36,"closeLosses":30,"closeGames":66,"closeLuck":-1.89,"compositeLuck":-0.51,"playoffOutcome":"MISSED","teamNameThatYear":"Cleveland Indians"},"2020":{"wins":35,"losses":25,"gamesPlayed":60,"runsScored":248,"runsAllowed":209,"pythExpectedWins":34.66,"pythLuck":0.34,"closeWins":18,"closeLosses":11,"closeGames":29,"closeLuck":1.08,"compositeLuck":0.64,"playoffOutcome":"WC","teamNameThatYear":"Cleveland Indians"},"2021":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":717,"runsAllowed":727,"pythExpectedWins":79.97,"pythLuck":0.03,"closeWins":34,"closeLosses":32,"closeGames":66,"closeLuck":1.41,"compositeLuck":0.58,"playoffOutcome":"MISSED","teamNameThatYear":"Cleveland Indians"},"2022":{"wins":92,"losses":70,"gamesPlayed":162,"runsScored":698,"runsAllowed":634,"pythExpectedWins":88.11,"pythLuck":3.89,"closeWins":43,"closeLosses":30,"closeGames":73,"closeLuck":1.54,"compositeLuck":2.95,"playoffOutcome":"DS","teamNameThatYear":"Cleveland Guardians"},"2023":{"wins":76,"losses":86,"gamesPlayed":162,"runsScored":662,"runsAllowed":697,"pythExpectedWins":77.18,"pythLuck":-1.18,"closeWins":42,"closeLosses":45,"closeGames":87,"closeLuck":1.19,"compositeLuck":-0.23,"playoffOutcome":"MISSED","teamNameThatYear":"Cleveland Guardians"},"2024":{"wins":92,"losses":69,"gamesPlayed":161,"runsScored":708,"runsAllowed":621,"pythExpectedWins":90.11,"pythLuck":1.89,"closeWins":46,"closeLosses":34,"closeGames":80,"closeLuck":0.29,"compositeLuck":1.25,"playoffOutcome":"LCS","teamNameThatYear":"Cleveland Guardians"},"2025":{"wins":88,"losses":74,"gamesPlayed":162,"runsScored":643,"runsAllowed":649,"pythExpectedWins":80.31,"pythLuck":7.69,"closeWins":50,"closeLosses":34,"closeGames":84,"closeLuck":4.37,"compositeLuck":6.36,"playoffOutcome":"WC","teamNameThatYear":"Cleveland Guardians"}}},{"id":115,"name":"Colorado Rockies","abbreviation":"COL","league":"NL","division":"W","totalLuck":18.77,"avgLuck":1.88,"seasons":{"2016":{"wins":75,"losses":87,"gamesPlayed":162,"runsScored":845,"runsAllowed":860,"pythExpectedWins":79.7,"pythLuck":-4.7,"closeWins":24,"closeLosses":36,"closeGames":60,"closeLuck":-3.78,"compositeLuck":-4.33,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"},"2017":{"wins":87,"losses":75,"gamesPlayed":162,"runsScored":824,"runsAllowed":757,"pythExpectedWins":87.27,"pythLuck":-0.27,"closeWins":35,"closeLosses":24,"closeGames":59,"closeLuck":3.31,"compositeLuck":1.16,"playoffOutcome":"WC","teamNameThatYear":"Colorado Rockies"},"2018":{"wins":91,"losses":72,"gamesPlayed":163,"runsScored":780,"runsAllowed":745,"pythExpectedWins":84.92,"pythLuck":6.08,"closeWins":49,"closeLosses":25,"closeGames":74,"closeLuck":7.69,"compositeLuck":6.72,"playoffOutcome":"DS","teamNameThatYear":"Colorado Rockies"},"2019":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":835,"runsAllowed":958,"pythExpectedWins":70.87,"pythLuck":0.13,"closeWins":33,"closeLosses":34,"closeGames":67,"closeLuck":3.64,"compositeLuck":1.53,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"},"2020":{"wins":26,"losses":34,"gamesPlayed":60,"runsScored":275,"runsAllowed":353,"pythExpectedWins":23.26,"pythLuck":2.74,"closeWins":11,"closeLosses":14,"closeGames":25,"closeLuck":0.17,"compositeLuck":1.71,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"},"2021":{"wins":74,"losses":87,"gamesPlayed":161,"runsScored":739,"runsAllowed":796,"pythExpectedWins":75.04,"pythLuck":-1.04,"closeWins":34,"closeLosses":41,"closeGames":75,"closeLuck":-0.47,"compositeLuck":-0.81,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"},"2022":{"wins":68,"losses":94,"gamesPlayed":162,"runsScored":698,"runsAllowed":873,"pythExpectedWins":64.65,"pythLuck":3.35,"closeWins":36,"closeLosses":37,"closeGames":73,"closeLuck":5.36,"compositeLuck":4.15,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"},"2023":{"wins":59,"losses":103,"gamesPlayed":162,"runsScored":721,"runsAllowed":957,"pythExpectedWins":60.47,"pythLuck":-1.47,"closeWins":28,"closeLosses":44,"closeGames":72,"closeLuck":1.78,"compositeLuck":-0.17,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"},"2024":{"wins":61,"losses":101,"gamesPlayed":162,"runsScored":682,"runsAllowed":929,"pythExpectedWins":58.68,"pythLuck":2.32,"closeWins":37,"closeLosses":33,"closeGames":70,"closeLuck":10.64,"compositeLuck":5.65,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"},"2025":{"wins":43,"losses":119,"gamesPlayed":162,"runsScored":597,"runsAllowed":1021,"pythExpectedWins":44.14,"pythLuck":-1.14,"closeWins":29,"closeLosses":44,"closeGames":73,"closeLuck":9.62,"compositeLuck":3.16,"playoffOutcome":"MISSED","teamNameThatYear":"Colorado Rockies"}}},{"id":116,"name":"Detroit Tigers","abbreviation":"DET","league":"AL","division":"C","totalLuck":17.19,"avgLuck":1.72,"seasons":{"2016":{"wins":86,"losses":75,"gamesPlayed":161,"runsScored":750,"runsAllowed":721,"pythExpectedWins":83.4,"pythLuck":2.6,"closeWins":40,"closeLosses":32,"closeGames":72,"closeLuck":1.54,"compositeLuck":2.18,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2017":{"wins":64,"losses":98,"gamesPlayed":162,"runsScored":735,"runsAllowed":894,"pythExpectedWins":66.64,"pythLuck":-2.64,"closeWins":26,"closeLosses":37,"closeGames":63,"closeLuck":1.11,"compositeLuck":-1.14,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2018":{"wins":64,"losses":98,"gamesPlayed":162,"runsScored":630,"runsAllowed":796,"pythExpectedWins":63.93,"pythLuck":0.07,"closeWins":36,"closeLosses":47,"closeGames":83,"closeLuck":3.21,"compositeLuck":1.33,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2019":{"wins":47,"losses":114,"gamesPlayed":161,"runsScored":582,"runsAllowed":915,"pythExpectedWins":48.96,"pythLuck":-1.96,"closeWins":27,"closeLosses":42,"closeGames":69,"closeLuck":6.86,"compositeLuck":1.57,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2020":{"wins":23,"losses":35,"gamesPlayed":58,"runsScored":249,"runsAllowed":318,"pythExpectedWins":22.62,"pythLuck":0.38,"closeWins":10,"closeLosses":15,"closeGames":25,"closeLuck":0.09,"compositeLuck":0.26,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2021":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":697,"runsAllowed":756,"pythExpectedWins":74.99,"pythLuck":2.01,"closeWins":39,"closeLosses":37,"closeGames":76,"closeLuck":2.88,"compositeLuck":2.36,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2022":{"wins":66,"losses":96,"gamesPlayed":162,"runsScored":557,"runsAllowed":713,"pythExpectedWins":63.0,"pythLuck":3.0,"closeWins":38,"closeLosses":42,"closeGames":80,"closeLuck":5.41,"compositeLuck":3.96,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2023":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":661,"runsAllowed":740,"pythExpectedWins":72.66,"pythLuck":5.34,"closeWins":41,"closeLosses":32,"closeGames":73,"closeLuck":5.85,"compositeLuck":5.54,"playoffOutcome":"MISSED","teamNameThatYear":"Detroit Tigers"},"2024":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":682,"runsAllowed":642,"pythExpectedWins":85.48,"pythLuck":0.52,"closeWins":42,"closeLosses":36,"closeGames":78,"closeLuck":0.59,"compositeLuck":0.55,"playoffOutcome":"DS","teamNameThatYear":"Detroit Tigers"},"2025":{"wins":87,"losses":75,"gamesPlayed":162,"runsScored":758,"runsAllowed":691,"pythExpectedWins":87.84,"pythLuck":-0.84,"closeWins":36,"closeLosses":26,"closeGames":62,"closeLuck":2.7,"compositeLuck":0.58,"playoffOutcome":"DS","teamNameThatYear":"Detroit Tigers"}}},{"id":117,"name":"Houston Astros","abbreviation":"HOU","league":"AL","division":"W","totalLuck":-22.93,"avgLuck":-2.29,"seasons":{"2016":{"wins":84,"losses":78,"gamesPlayed":162,"runsScored":724,"runsAllowed":701,"pythExpectedWins":83.39,"pythLuck":0.61,"closeWins":44,"closeLosses":41,"closeGames":85,"closeLuck":-0.07,"compositeLuck":0.34,"playoffOutcome":"MISSED","teamNameThatYear":"Houston Astros"},"2017":{"wins":101,"losses":61,"gamesPlayed":162,"runsScored":896,"runsAllowed":700,"pythExpectedWins":98.99,"pythLuck":2.01,"closeWins":35,"closeLosses":30,"closeGames":65,"closeLuck":-5.52,"compositeLuck":-1.0,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Houston Astros"},"2018":{"wins":103,"losses":59,"gamesPlayed":162,"runsScored":797,"runsAllowed":534,"pythExpectedWins":109.42,"pythLuck":-6.42,"closeWins":38,"closeLosses":35,"closeGames":73,"closeLuck":-8.41,"compositeLuck":-7.22,"playoffOutcome":"LCS","teamNameThatYear":"Houston Astros"},"2019":{"wins":107,"losses":55,"gamesPlayed":162,"runsScored":920,"runsAllowed":640,"pythExpectedWins":106.95,"pythLuck":0.05,"closeWins":41,"closeLosses":28,"closeGames":69,"closeLuck":-4.57,"compositeLuck":-1.8,"playoffOutcome":"PENNANT","teamNameThatYear":"Houston Astros"},"2020":{"wins":29,"losses":31,"gamesPlayed":60,"runsScored":279,"runsAllowed":275,"pythExpectedWins":30.4,"pythLuck":-1.4,"closeWins":14,"closeLosses":19,"closeGames":33,"closeLuck":-1.95,"compositeLuck":-1.62,"playoffOutcome":"LCS","teamNameThatYear":"Houston Astros"},"2021":{"wins":95,"losses":67,"gamesPlayed":162,"runsScored":863,"runsAllowed":658,"pythExpectedWins":100.7,"pythLuck":-5.7,"closeWins":30,"closeLosses":34,"closeGames":64,"closeLuck":-7.53,"compositeLuck":-6.43,"playoffOutcome":"PENNANT","teamNameThatYear":"Houston Astros"},"2022":{"wins":106,"losses":56,"gamesPlayed":162,"runsScored":737,"runsAllowed":518,"pythExpectedWins":106.26,"pythLuck":-0.26,"closeWins":47,"closeLosses":25,"closeGames":72,"closeLuck":-0.11,"compositeLuck":-0.2,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Houston Astros"},"2023":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":827,"runsAllowed":698,"pythExpectedWins":93.47,"pythLuck":-3.47,"closeWins":38,"closeLosses":39,"closeGames":77,"closeLuck":-4.78,"compositeLuck":-3.99,"playoffOutcome":"LCS","teamNameThatYear":"Houston Astros"},"2024":{"wins":88,"losses":73,"gamesPlayed":161,"runsScored":740,"runsAllowed":649,"pythExpectedWins":90.12,"pythLuck":-2.12,"closeWins":34,"closeLosses":43,"closeGames":77,"closeLuck":-8.09,"compositeLuck":-4.51,"playoffOutcome":"WC","teamNameThatYear":"Houston Astros"},"2025":{"wins":87,"losses":75,"gamesPlayed":162,"runsScored":686,"runsAllowed":665,"pythExpectedWins":83.3,"pythLuck":3.7,"closeWins":44,"closeLosses":32,"closeGames":76,"closeLuck":3.19,"compositeLuck":3.5,"playoffOutcome":"MISSED","teamNameThatYear":"Houston Astros"}}},{"id":118,"name":"Kansas City Royals","abbreviation":"KC","league":"AL","division":"C","totalLuck":5.74,"avgLuck":0.57,"seasons":{"2016":{"wins":81,"losses":81,"gamesPlayed":162,"runsScored":675,"runsAllowed":712,"pythExpectedWins":77.05,"pythLuck":3.95,"closeWins":37,"closeLosses":37,"closeGames":74,"closeLuck":0.0,"compositeLuck":2.37,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2017":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":702,"runsAllowed":791,"pythExpectedWins":72.19,"pythLuck":7.81,"closeWins":42,"closeLosses":29,"closeGames":71,"closeLuck":6.94,"compositeLuck":7.46,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2018":{"wins":58,"losses":104,"gamesPlayed":162,"runsScored":638,"runsAllowed":833,"pythExpectedWins":61.62,"pythLuck":-3.62,"closeWins":30,"closeLosses":44,"closeGames":74,"closeLuck":3.51,"compositeLuck":-0.77,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2019":{"wins":59,"losses":103,"gamesPlayed":162,"runsScored":691,"runsAllowed":869,"pythExpectedWins":64.26,"pythLuck":-5.26,"closeWins":28,"closeLosses":42,"closeGames":70,"closeLuck":2.51,"compositeLuck":-2.15,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2020":{"wins":26,"losses":34,"gamesPlayed":60,"runsScored":248,"runsAllowed":272,"pythExpectedWins":27.47,"pythLuck":-1.47,"closeWins":13,"closeLosses":15,"closeGames":28,"closeLuck":0.87,"compositeLuck":-0.53,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2021":{"wins":74,"losses":88,"gamesPlayed":162,"runsScored":686,"runsAllowed":788,"pythExpectedWins":70.78,"pythLuck":3.22,"closeWins":37,"closeLosses":31,"closeGames":68,"closeLuck":5.94,"compositeLuck":4.31,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2022":{"wins":65,"losses":97,"gamesPlayed":162,"runsScored":640,"runsAllowed":810,"pythExpectedWins":63.81,"pythLuck":1.19,"closeWins":33,"closeLosses":39,"closeGames":72,"closeLuck":4.11,"compositeLuck":2.36,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2023":{"wins":56,"losses":106,"gamesPlayed":162,"runsScored":676,"runsAllowed":859,"pythExpectedWins":63.52,"pythLuck":-7.52,"closeWins":30,"closeLosses":42,"closeGames":72,"closeLuck":5.11,"compositeLuck":-2.47,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"},"2024":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":735,"runsAllowed":644,"pythExpectedWins":90.75,"pythLuck":-4.75,"closeWins":30,"closeLosses":37,"closeGames":67,"closeLuck":-5.57,"compositeLuck":-5.08,"playoffOutcome":"DS","teamNameThatYear":"Kansas City Royals"},"2025":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":651,"runsAllowed":637,"pythExpectedWins":82.61,"pythLuck":-0.61,"closeWins":41,"closeLosses":37,"closeGames":78,"closeLuck":1.52,"compositeLuck":0.24,"playoffOutcome":"MISSED","teamNameThatYear":"Kansas City Royals"}}},{"id":108,"name":"Los Angeles Angels","abbreviation":"LAA","league":"AL","division":"W","totalLuck":2.32,"avgLuck":0.23,"seasons":{"2016":{"wins":74,"losses":88,"gamesPlayed":162,"runsScored":717,"runsAllowed":727,"pythExpectedWins":79.97,"pythLuck":-5.97,"closeWins":32,"closeLosses":39,"closeGames":71,"closeLuck":-0.43,"compositeLuck":-3.75,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2017":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":710,"runsAllowed":709,"pythExpectedWins":81.1,"pythLuck":-1.1,"closeWins":40,"closeLosses":41,"closeGames":81,"closeLuck":0.0,"compositeLuck":-0.66,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2018":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":721,"runsAllowed":722,"pythExpectedWins":80.9,"pythLuck":-0.9,"closeWins":32,"closeLosses":41,"closeGames":73,"closeLuck":-4.05,"compositeLuck":-2.16,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2019":{"wins":72,"losses":90,"gamesPlayed":162,"runsScored":769,"runsAllowed":868,"pythExpectedWins":72.06,"pythLuck":-0.06,"closeWins":29,"closeLosses":33,"closeGames":62,"closeLuck":1.44,"compositeLuck":0.54,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2020":{"wins":26,"losses":34,"gamesPlayed":60,"runsScored":294,"runsAllowed":321,"pythExpectedWins":27.59,"pythLuck":-1.59,"closeWins":13,"closeLosses":12,"closeGames":25,"closeLuck":2.17,"compositeLuck":-0.09,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2021":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":723,"runsAllowed":804,"pythExpectedWins":73.15,"pythLuck":3.85,"closeWins":37,"closeLosses":27,"closeGames":64,"closeLuck":6.58,"compositeLuck":4.94,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2022":{"wins":73,"losses":89,"gamesPlayed":162,"runsScored":623,"runsAllowed":668,"pythExpectedWins":75.84,"pythLuck":-2.84,"closeWins":30,"closeLosses":42,"closeGames":72,"closeLuck":-2.44,"compositeLuck":-2.68,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2023":{"wins":73,"losses":89,"gamesPlayed":162,"runsScored":739,"runsAllowed":829,"pythExpectedWins":72.51,"pythLuck":0.49,"closeWins":38,"closeLosses":40,"closeGames":78,"closeLuck":2.85,"compositeLuck":1.43,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2024":{"wins":63,"losses":99,"gamesPlayed":162,"runsScored":635,"runsAllowed":797,"pythExpectedWins":64.4,"pythLuck":-1.4,"closeWins":32,"closeLosses":50,"closeGames":82,"closeLuck":0.11,"compositeLuck":-0.8,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"},"2025":{"wins":72,"losses":90,"gamesPlayed":162,"runsScored":673,"runsAllowed":837,"pythExpectedWins":65.05,"pythLuck":6.95,"closeWins":35,"closeLosses":36,"closeGames":71,"closeLuck":3.44,"compositeLuck":5.55,"playoffOutcome":"MISSED","teamNameThatYear":"Los Angeles Angels"}}},{"id":119,"name":"Los Angeles Dodgers","abbreviation":"LAD","league":"NL","division":"W","totalLuck":-30.88,"avgLuck":-3.09,"seasons":{"2016":{"wins":91,"losses":71,"gamesPlayed":162,"runsScored":725,"runsAllowed":638,"pythExpectedWins":90.43,"pythLuck":0.57,"closeWins":38,"closeLosses":34,"closeGames":72,"closeLuck":-2.44,"compositeLuck":-0.63,"playoffOutcome":"LCS","teamNameThatYear":"Los Angeles Dodgers"},"2017":{"wins":104,"losses":58,"gamesPlayed":162,"runsScored":770,"runsAllowed":580,"pythExpectedWins":101.54,"pythLuck":2.46,"closeWins":45,"closeLosses":32,"closeGames":77,"closeLuck":-4.43,"compositeLuck":-0.3,"playoffOutcome":"PENNANT","teamNameThatYear":"Los Angeles Dodgers"},"2018":{"wins":92,"losses":71,"gamesPlayed":163,"runsScored":804,"runsAllowed":610,"pythExpectedWins":101.67,"pythLuck":-9.67,"closeWins":37,"closeLosses":42,"closeGames":79,"closeLuck":-7.59,"compositeLuck":-8.84,"playoffOutcome":"PENNANT","teamNameThatYear":"Los Angeles Dodgers"},"2019":{"wins":106,"losses":56,"gamesPlayed":162,"runsScored":886,"runsAllowed":613,"pythExpectedWins":107.31,"pythLuck":-1.31,"closeWins":45,"closeLosses":30,"closeGames":75,"closeLuck":-4.07,"compositeLuck":-2.41,"playoffOutcome":"DS","teamNameThatYear":"Los Angeles Dodgers"},"2020":{"wins":43,"losses":17,"gamesPlayed":60,"runsScored":349,"runsAllowed":213,"pythExpectedWins":42.7,"pythLuck":0.3,"closeWins":13,"closeLosses":11,"closeGames":24,"closeLuck":-4.2,"compositeLuck":-1.5,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Los Angeles Dodgers"},"2021":{"wins":106,"losses":56,"gamesPlayed":162,"runsScored":830,"runsAllowed":561,"pythExpectedWins":108.85,"pythLuck":-2.85,"closeWins":47,"closeLosses":35,"closeGames":82,"closeLuck":-6.65,"compositeLuck":-4.37,"playoffOutcome":"LCS","teamNameThatYear":"Los Angeles Dodgers"},"2022":{"wins":111,"losses":51,"gamesPlayed":162,"runsScored":847,"runsAllowed":513,"pythExpectedWins":115.76,"pythLuck":-4.76,"closeWins":34,"closeLosses":30,"closeGames":64,"closeLuck":-9.85,"compositeLuck":-6.8,"playoffOutcome":"DS","teamNameThatYear":"Los Angeles Dodgers"},"2023":{"wins":100,"losses":62,"gamesPlayed":162,"runsScored":906,"runsAllowed":699,"pythExpectedWins":99.87,"pythLuck":0.13,"closeWins":27,"closeLosses":23,"closeGames":50,"closeLuck":-3.86,"compositeLuck":-1.47,"playoffOutcome":"DS","teamNameThatYear":"Los Angeles Dodgers"},"2024":{"wins":98,"losses":64,"gamesPlayed":162,"runsScored":842,"runsAllowed":686,"pythExpectedWins":96.01,"pythLuck":1.99,"closeWins":36,"closeLosses":31,"closeGames":67,"closeLuck":-4.53,"compositeLuck":-0.62,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Los Angeles Dodgers"},"2025":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":825,"runsAllowed":683,"pythExpectedWins":94.86,"pythLuck":-1.86,"closeWins":36,"closeLosses":39,"closeGames":75,"closeLuck":-7.06,"compositeLuck":-3.94,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Los Angeles Dodgers"}}},{"id":146,"name":"Miami Marlins","abbreviation":"MIA","league":"NL","division":"E","totalLuck":18.07,"avgLuck":1.81,"seasons":{"2016":{"wins":79,"losses":82,"gamesPlayed":161,"runsScored":655,"runsAllowed":682,"pythExpectedWins":77.53,"pythLuck":1.47,"closeWins":41,"closeLosses":43,"closeGames":84,"closeLuck":-0.22,"compositeLuck":0.79,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"},"2017":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":778,"runsAllowed":822,"pythExpectedWins":76.93,"pythLuck":0.07,"closeWins":30,"closeLosses":38,"closeGames":68,"closeLuck":-2.32,"compositeLuck":-0.89,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"},"2018":{"wins":63,"losses":98,"gamesPlayed":161,"runsScored":589,"runsAllowed":809,"pythExpectedWins":57.76,"pythLuck":5.24,"closeWins":31,"closeLosses":36,"closeGames":67,"closeLuck":4.78,"compositeLuck":5.06,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"},"2019":{"wins":57,"losses":105,"gamesPlayed":162,"runsScored":615,"runsAllowed":808,"pythExpectedWins":61.18,"pythLuck":-4.18,"closeWins":29,"closeLosses":40,"closeGames":69,"closeLuck":4.72,"compositeLuck":-0.62,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"},"2020":{"wins":31,"losses":29,"gamesPlayed":60,"runsScored":263,"runsAllowed":304,"pythExpectedWins":26.05,"pythLuck":4.95,"closeWins":15,"closeLosses":13,"closeGames":28,"closeLuck":0.53,"compositeLuck":3.18,"playoffOutcome":"DS","teamNameThatYear":"Miami Marlins"},"2021":{"wins":67,"losses":95,"gamesPlayed":162,"runsScored":623,"runsAllowed":701,"pythExpectedWins":72.29,"pythLuck":-5.29,"closeWins":34,"closeLosses":56,"closeGames":90,"closeLuck":-3.22,"compositeLuck":-4.46,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"},"2022":{"wins":69,"losses":93,"gamesPlayed":162,"runsScored":586,"runsAllowed":676,"pythExpectedWins":70.47,"pythLuck":-1.47,"closeWins":35,"closeLosses":52,"closeGames":87,"closeLuck":-2.06,"compositeLuck":-1.71,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"},"2023":{"wins":84,"losses":78,"gamesPlayed":162,"runsScored":666,"runsAllowed":723,"pythExpectedWins":74.93,"pythLuck":9.07,"closeWins":48,"closeLosses":31,"closeGames":79,"closeLuck":7.04,"compositeLuck":8.26,"playoffOutcome":"WC","teamNameThatYear":"Miami Marlins"},"2024":{"wins":62,"losses":100,"gamesPlayed":162,"runsScored":637,"runsAllowed":841,"pythExpectedWins":60.84,"pythLuck":1.16,"closeWins":34,"closeLosses":41,"closeGames":75,"closeLuck":5.3,"compositeLuck":2.82,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"},"2025":{"wins":79,"losses":83,"gamesPlayed":162,"runsScored":709,"runsAllowed":798,"pythExpectedWins":72.27,"pythLuck":6.73,"closeWins":44,"closeLosses":38,"closeGames":82,"closeLuck":4.01,"compositeLuck":5.64,"playoffOutcome":"MISSED","teamNameThatYear":"Miami Marlins"}}},{"id":158,"name":"Milwaukee Brewers","abbreviation":"MIL","league":"NL","division":"C","totalLuck":9.52,"avgLuck":0.95,"seasons":{"2016":{"wins":73,"losses":89,"gamesPlayed":162,"runsScored":671,"runsAllowed":733,"pythExpectedWins":74.46,"pythLuck":-1.46,"closeWins":42,"closeLosses":38,"closeGames":80,"closeLuck":5.95,"compositeLuck":1.5,"playoffOutcome":"MISSED","teamNameThatYear":"Milwaukee Brewers"},"2017":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":732,"runsAllowed":697,"pythExpectedWins":84.63,"pythLuck":1.37,"closeWins":41,"closeLosses":42,"closeGames":83,"closeLuck":-3.06,"compositeLuck":-0.4,"playoffOutcome":"MISSED","teamNameThatYear":"Milwaukee Brewers"},"2018":{"wins":96,"losses":67,"gamesPlayed":163,"runsScored":754,"runsAllowed":659,"pythExpectedWins":91.49,"pythLuck":4.51,"closeWins":50,"closeLosses":31,"closeGames":81,"closeLuck":2.29,"compositeLuck":3.62,"playoffOutcome":"LCS","teamNameThatYear":"Milwaukee Brewers"},"2019":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":769,"runsAllowed":766,"pythExpectedWins":81.29,"pythLuck":7.71,"closeWins":51,"closeLosses":30,"closeGames":81,"closeLuck":6.5,"compositeLuck":7.23,"playoffOutcome":"WC","teamNameThatYear":"Milwaukee Brewers"},"2020":{"wins":29,"losses":31,"gamesPlayed":60,"runsScored":247,"runsAllowed":264,"pythExpectedWins":28.18,"pythLuck":0.82,"closeWins":14,"closeLosses":12,"closeGames":26,"closeLuck":1.43,"compositeLuck":1.06,"playoffOutcome":"WC","teamNameThatYear":"Milwaukee Brewers"},"2021":{"wins":95,"losses":67,"gamesPlayed":162,"runsScored":738,"runsAllowed":623,"pythExpectedWins":93.46,"pythLuck":1.54,"closeWins":35,"closeLosses":31,"closeGames":66,"closeLuck":-3.7,"compositeLuck":-0.56,"playoffOutcome":"DS","teamNameThatYear":"Milwaukee Brewers"},"2022":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":725,"runsAllowed":688,"pythExpectedWins":84.88,"pythLuck":1.12,"closeWins":46,"closeLosses":40,"closeGames":86,"closeLuck":0.35,"compositeLuck":0.81,"playoffOutcome":"MISSED","teamNameThatYear":"Milwaukee Brewers"},"2023":{"wins":92,"losses":70,"gamesPlayed":162,"runsScored":728,"runsAllowed":647,"pythExpectedWins":89.71,"pythLuck":2.29,"closeWins":45,"closeLosses":35,"closeGames":80,"closeLuck":-0.43,"compositeLuck":1.2,"playoffOutcome":"WC","teamNameThatYear":"Milwaukee Brewers"},"2024":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":777,"runsAllowed":641,"pythExpectedWins":95.11,"pythLuck":-2.11,"closeWins":45,"closeLosses":39,"closeGames":84,"closeLuck":-3.22,"compositeLuck":-2.55,"playoffOutcome":"WC","teamNameThatYear":"Milwaukee Brewers"},"2025":{"wins":97,"losses":65,"gamesPlayed":162,"runsScored":806,"runsAllowed":634,"pythExpectedWins":98.51,"pythLuck":-1.51,"closeWins":40,"closeLosses":33,"closeGames":73,"closeLuck":-3.71,"compositeLuck":-2.39,"playoffOutcome":"LCS","teamNameThatYear":"Milwaukee Brewers"}}},{"id":142,"name":"Minnesota Twins","abbreviation":"MIN","league":"AL","division":"C","totalLuck":-9.12,"avgLuck":-0.91,"seasons":{"2016":{"wins":59,"losses":103,"gamesPlayed":162,"runsScored":722,"runsAllowed":889,"pythExpectedWins":65.76,"pythLuck":-6.76,"closeWins":27,"closeLosses":48,"closeGames":75,"closeLuck":-0.31,"compositeLuck":-4.18,"playoffOutcome":"MISSED","teamNameThatYear":"Minnesota Twins"},"2017":{"wins":85,"losses":77,"gamesPlayed":162,"runsScored":815,"runsAllowed":788,"pythExpectedWins":83.5,"pythLuck":1.5,"closeWins":35,"closeLosses":27,"closeGames":62,"closeLuck":2.47,"compositeLuck":1.89,"playoffOutcome":"WC","teamNameThatYear":"Minnesota Twins"},"2018":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":738,"runsAllowed":775,"pythExpectedWins":77.38,"pythLuck":0.62,"closeWins":34,"closeLosses":38,"closeGames":72,"closeLuck":-0.67,"compositeLuck":0.1,"playoffOutcome":"MISSED","teamNameThatYear":"Minnesota Twins"},"2019":{"wins":101,"losses":61,"gamesPlayed":162,"runsScored":939,"runsAllowed":754,"pythExpectedWins":97.05,"pythLuck":3.95,"closeWins":42,"closeLosses":26,"closeGames":68,"closeLuck":-0.4,"compositeLuck":2.21,"playoffOutcome":"DS","teamNameThatYear":"Minnesota Twins"},"2020":{"wins":36,"losses":24,"gamesPlayed":60,"runsScored":269,"runsAllowed":215,"pythExpectedWins":36.07,"pythLuck":-0.07,"closeWins":16,"closeLosses":15,"closeGames":31,"closeLuck":-2.6,"compositeLuck":-1.08,"playoffOutcome":"WC","teamNameThatYear":"Minnesota Twins"},"2021":{"wins":73,"losses":89,"gamesPlayed":162,"runsScored":729,"runsAllowed":834,"pythExpectedWins":71.08,"pythLuck":1.92,"closeWins":39,"closeLosses":36,"closeGames":75,"closeLuck":5.2,"compositeLuck":3.23,"playoffOutcome":"MISSED","teamNameThatYear":"Minnesota Twins"},"2022":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":696,"runsAllowed":684,"pythExpectedWins":82.29,"pythLuck":-4.29,"closeWins":29,"closeLosses":42,"closeGames":71,"closeLuck":-5.19,"compositeLuck":-4.65,"playoffOutcome":"MISSED","teamNameThatYear":"Minnesota Twins"},"2023":{"wins":87,"losses":75,"gamesPlayed":162,"runsScored":778,"runsAllowed":659,"pythExpectedWins":93.21,"pythLuck":-6.21,"closeWins":40,"closeLosses":39,"closeGames":79,"closeLuck":-2.43,"compositeLuck":-4.7,"playoffOutcome":"DS","teamNameThatYear":"Minnesota Twins"},"2024":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":742,"runsAllowed":735,"pythExpectedWins":81.7,"pythLuck":0.3,"closeWins":35,"closeLosses":34,"closeGames":69,"closeLuck":0.07,"compositeLuck":0.21,"playoffOutcome":"MISSED","teamNameThatYear":"Minnesota Twins"},"2025":{"wins":70,"losses":92,"gamesPlayed":162,"runsScored":678,"runsAllowed":773,"pythExpectedWins":71.33,"pythLuck":-1.33,"closeWins":26,"closeLosses":42,"closeGames":68,"closeLuck":-3.38,"compositeLuck":-2.15,"playoffOutcome":"MISSED","teamNameThatYear":"Minnesota Twins"}}},{"id":121,"name":"New York Mets","abbreviation":"NYM","league":"NL","division":"E","totalLuck":-5.89,"avgLuck":-0.59,"seasons":{"2016":{"wins":87,"losses":75,"gamesPlayed":162,"runsScored":671,"runsAllowed":617,"pythExpectedWins":87.21,"pythLuck":-0.21,"closeWins":48,"closeLosses":37,"closeGames":85,"closeLuck":2.35,"compositeLuck":0.81,"playoffOutcome":"WC","teamNameThatYear":"New York Mets"},"2017":{"wins":70,"losses":92,"gamesPlayed":162,"runsScored":735,"runsAllowed":863,"pythExpectedWins":69.19,"pythLuck":0.81,"closeWins":33,"closeLosses":40,"closeGames":73,"closeLuck":1.46,"compositeLuck":1.07,"playoffOutcome":"MISSED","teamNameThatYear":"New York Mets"},"2018":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":676,"runsAllowed":707,"pythExpectedWins":77.68,"pythLuck":-0.68,"closeWins":36,"closeLosses":45,"closeGames":81,"closeLuck":-2.5,"compositeLuck":-1.41,"playoffOutcome":"MISSED","teamNameThatYear":"New York Mets"},"2019":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":791,"runsAllowed":737,"pythExpectedWins":86.23,"pythLuck":-0.23,"closeWins":37,"closeLosses":35,"closeGames":72,"closeLuck":-1.22,"compositeLuck":-0.63,"playoffOutcome":"MISSED","teamNameThatYear":"New York Mets"},"2020":{"wins":26,"losses":34,"gamesPlayed":60,"runsScored":286,"runsAllowed":308,"pythExpectedWins":27.97,"pythLuck":-1.97,"closeWins":11,"closeLosses":17,"closeGames":28,"closeLuck":-1.13,"compositeLuck":-1.63,"playoffOutcome":"MISSED","teamNameThatYear":"New York Mets"},"2021":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":636,"runsAllowed":668,"pythExpectedWins":77.36,"pythLuck":-0.36,"closeWins":45,"closeLosses":49,"closeGames":94,"closeLuck":0.32,"compositeLuck":-0.09,"playoffOutcome":"MISSED","teamNameThatYear":"New York Mets"},"2022":{"wins":101,"losses":61,"gamesPlayed":162,"runsScored":772,"runsAllowed":606,"pythExpectedWins":98.66,"pythLuck":2.34,"closeWins":36,"closeLosses":25,"closeGames":61,"closeLuck":-2.03,"compositeLuck":0.59,"playoffOutcome":"WC","teamNameThatYear":"New York Mets"},"2023":{"wins":75,"losses":87,"gamesPlayed":162,"runsScored":717,"runsAllowed":729,"pythExpectedWins":79.77,"pythLuck":-4.77,"closeWins":37,"closeLosses":47,"closeGames":84,"closeLuck":-1.89,"compositeLuck":-3.62,"playoffOutcome":"MISSED","teamNameThatYear":"New York Mets"},"2024":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":768,"runsAllowed":697,"pythExpectedWins":88.17,"pythLuck":0.83,"closeWins":43,"closeLosses":30,"closeGames":73,"closeLuck":2.9,"compositeLuck":1.66,"playoffOutcome":"LCS","teamNameThatYear":"New York Mets"},"2025":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":766,"runsAllowed":715,"pythExpectedWins":86.1,"pythLuck":-3.1,"closeWins":37,"closeLosses":39,"closeGames":76,"closeLuck":-1.94,"compositeLuck":-2.64,"playoffOutcome":"MISSED","teamNameThatYear":"New York Mets"}}},{"id":147,"name":"New York Yankees","abbreviation":"NYY","league":"AL","division":"E","totalLuck":-11.33,"avgLuck":-1.13,"seasons":{"2016":{"wins":84,"losses":78,"gamesPlayed":162,"runsScored":680,"runsAllowed":702,"pythExpectedWins":78.64,"pythLuck":5.36,"closeWins":39,"closeLosses":29,"closeGames":68,"closeLuck":3.74,"compositeLuck":4.71,"playoffOutcome":"MISSED","teamNameThatYear":"New York Yankees"},"2017":{"wins":91,"losses":71,"gamesPlayed":162,"runsScored":858,"runsAllowed":660,"pythExpectedWins":100.08,"pythLuck":-9.08,"closeWins":29,"closeLosses":35,"closeGames":64,"closeLuck":-6.95,"compositeLuck":-8.23,"playoffOutcome":"LCS","teamNameThatYear":"New York Yankees"},"2018":{"wins":100,"losses":62,"gamesPlayed":162,"runsScored":851,"runsAllowed":669,"pythExpectedWins":98.55,"pythLuck":1.45,"closeWins":37,"closeLosses":30,"closeGames":67,"closeLuck":-4.36,"compositeLuck":-0.87,"playoffOutcome":"DS","teamNameThatYear":"New York Yankees"},"2019":{"wins":103,"losses":59,"gamesPlayed":162,"runsScored":943,"runsAllowed":739,"pythExpectedWins":98.77,"pythLuck":4.23,"closeWins":36,"closeLosses":30,"closeGames":66,"closeLuck":-5.96,"compositeLuck":0.15,"playoffOutcome":"LCS","teamNameThatYear":"New York Yankees"},"2020":{"wins":33,"losses":27,"gamesPlayed":60,"runsScored":315,"runsAllowed":270,"pythExpectedWins":34.2,"pythLuck":-1.2,"closeWins":12,"closeLosses":12,"closeGames":24,"closeLuck":-1.2,"compositeLuck":-1.2,"playoffOutcome":"DS","teamNameThatYear":"New York Yankees"},"2021":{"wins":92,"losses":70,"gamesPlayed":162,"runsScored":711,"runsAllowed":669,"pythExpectedWins":85.51,"pythLuck":6.49,"closeWins":55,"closeLosses":34,"closeGames":89,"closeLuck":4.46,"compositeLuck":5.68,"playoffOutcome":"WC","teamNameThatYear":"New York Yankees"},"2022":{"wins":99,"losses":63,"gamesPlayed":162,"runsScored":807,"runsAllowed":567,"pythExpectedWins":106.29,"pythLuck":-7.29,"closeWins":49,"closeLosses":42,"closeGames":91,"closeLuck":-6.61,"compositeLuck":-7.02,"playoffOutcome":"LCS","teamNameThatYear":"New York Yankees"},"2023":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":673,"runsAllowed":698,"pythExpectedWins":78.3,"pythLuck":3.7,"closeWins":34,"closeLosses":30,"closeGames":64,"closeLuck":1.6,"compositeLuck":2.86,"playoffOutcome":"MISSED","teamNameThatYear":"New York Yankees"},"2024":{"wins":94,"losses":68,"gamesPlayed":162,"runsScored":815,"runsAllowed":668,"pythExpectedWins":95.58,"pythLuck":-1.58,"closeWins":33,"closeLosses":34,"closeGames":67,"closeLuck":-5.88,"compositeLuck":-3.3,"playoffOutcome":"PENNANT","teamNameThatYear":"New York Yankees"},"2025":{"wins":94,"losses":68,"gamesPlayed":162,"runsScored":849,"runsAllowed":685,"pythExpectedWins":96.71,"pythLuck":-2.71,"closeWins":35,"closeLosses":36,"closeGames":71,"closeLuck":-6.2,"compositeLuck":-4.11,"playoffOutcome":"DS","teamNameThatYear":"New York Yankees"}}},{"id":143,"name":"Philadelphia Phillies","abbreviation":"PHI","league":"NL","division":"E","totalLuck":9.37,"avgLuck":0.94,"seasons":{"2016":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":610,"runsAllowed":796,"pythExpectedWins":61.66,"pythLuck":9.34,"closeWins":36,"closeLosses":35,"closeGames":71,"closeLuck":4.88,"compositeLuck":7.56,"playoffOutcome":"MISSED","teamNameThatYear":"Philadelphia Phillies"},"2017":{"wins":66,"losses":96,"gamesPlayed":162,"runsScored":690,"runsAllowed":782,"pythExpectedWins":71.76,"pythLuck":-5.76,"closeWins":32,"closeLosses":45,"closeGames":77,"closeLuck":0.63,"compositeLuck":-3.2,"playoffOutcome":"MISSED","teamNameThatYear":"Philadelphia Phillies"},"2018":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":677,"runsAllowed":728,"pythExpectedWins":75.62,"pythLuck":4.38,"closeWins":36,"closeLosses":40,"closeGames":76,"closeLuck":-1.53,"compositeLuck":2.02,"playoffOutcome":"MISSED","teamNameThatYear":"Philadelphia Phillies"},"2019":{"wins":81,"losses":81,"gamesPlayed":162,"runsScored":774,"runsAllowed":794,"pythExpectedWins":79.11,"pythLuck":1.89,"closeWins":33,"closeLosses":31,"closeGames":64,"closeLuck":1.0,"compositeLuck":1.53,"playoffOutcome":"MISSED","teamNameThatYear":"Philadelphia Phillies"},"2020":{"wins":28,"losses":32,"gamesPlayed":60,"runsScored":306,"runsAllowed":311,"pythExpectedWins":29.56,"pythLuck":-1.56,"closeWins":11,"closeLosses":14,"closeGames":25,"closeLuck":-0.67,"compositeLuck":-1.2,"playoffOutcome":"MISSED","teamNameThatYear":"Philadelphia Phillies"},"2021":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":734,"runsAllowed":745,"pythExpectedWins":79.9,"pythLuck":2.1,"closeWins":46,"closeLosses":41,"closeGames":87,"closeLuck":1.96,"compositeLuck":2.04,"playoffOutcome":"MISSED","teamNameThatYear":"Philadelphia Phillies"},"2022":{"wins":87,"losses":75,"gamesPlayed":162,"runsScored":747,"runsAllowed":685,"pythExpectedWins":87.41,"pythLuck":-0.41,"closeWins":41,"closeLosses":37,"closeGames":78,"closeLuck":-0.89,"compositeLuck":-0.6,"playoffOutcome":"PENNANT","teamNameThatYear":"Philadelphia Phillies"},"2023":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":796,"runsAllowed":715,"pythExpectedWins":88.93,"pythLuck":1.07,"closeWins":45,"closeLosses":41,"closeGames":86,"closeLuck":-2.78,"compositeLuck":-0.47,"playoffOutcome":"LCS","teamNameThatYear":"Philadelphia Phillies"},"2024":{"wins":95,"losses":67,"gamesPlayed":162,"runsScored":784,"runsAllowed":671,"pythExpectedWins":92.46,"pythLuck":2.54,"closeWins":38,"closeLosses":26,"closeGames":64,"closeLuck":0.47,"compositeLuck":1.71,"playoffOutcome":"DS","teamNameThatYear":"Philadelphia Phillies"},"2025":{"wins":96,"losses":66,"gamesPlayed":162,"runsScored":778,"runsAllowed":648,"pythExpectedWins":94.43,"pythLuck":1.57,"closeWins":45,"closeLosses":35,"closeGames":80,"closeLuck":-2.41,"compositeLuck":-0.02,"playoffOutcome":"DS","teamNameThatYear":"Philadelphia Phillies"}}},{"id":134,"name":"Pittsburgh Pirates","abbreviation":"PIT","league":"NL","division":"C","totalLuck":17.88,"avgLuck":1.79,"seasons":{"2016":{"wins":78,"losses":83,"gamesPlayed":162,"runsScored":729,"runsAllowed":758,"pythExpectedWins":78.11,"pythLuck":-0.11,"closeWins":36,"closeLosses":35,"closeGames":71,"closeLuck":1.81,"compositeLuck":0.66,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2017":{"wins":75,"losses":87,"gamesPlayed":162,"runsScored":668,"runsAllowed":731,"pythExpectedWins":74.34,"pythLuck":0.66,"closeWins":33,"closeLosses":33,"closeGames":66,"closeLuck":2.44,"compositeLuck":1.37,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2018":{"wins":82,"losses":79,"gamesPlayed":161,"runsScored":692,"runsAllowed":693,"pythExpectedWins":80.39,"pythLuck":1.61,"closeWins":40,"closeLosses":35,"closeGames":75,"closeLuck":1.8,"compositeLuck":1.69,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2019":{"wins":69,"losses":93,"gamesPlayed":162,"runsScored":758,"runsAllowed":911,"pythExpectedWins":67.5,"pythLuck":1.5,"closeWins":34,"closeLosses":41,"closeGames":75,"closeLuck":2.06,"compositeLuck":1.72,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2020":{"wins":19,"losses":41,"gamesPlayed":60,"runsScored":219,"runsAllowed":298,"pythExpectedWins":21.76,"pythLuck":-2.76,"closeWins":10,"closeLosses":19,"closeGames":29,"closeLuck":0.82,"compositeLuck":-1.33,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2021":{"wins":61,"losses":101,"gamesPlayed":162,"runsScored":609,"runsAllowed":833,"pythExpectedWins":58.4,"pythLuck":2.6,"closeWins":31,"closeLosses":40,"closeGames":71,"closeLuck":4.27,"compositeLuck":3.27,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2022":{"wins":62,"losses":100,"gamesPlayed":162,"runsScored":591,"runsAllowed":817,"pythExpectedWins":57.68,"pythLuck":4.32,"closeWins":36,"closeLosses":53,"closeGames":89,"closeLuck":1.94,"compositeLuck":3.37,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2023":{"wins":76,"losses":86,"gamesPlayed":162,"runsScored":692,"runsAllowed":790,"pythExpectedWins":71.23,"pythLuck":4.77,"closeWins":40,"closeLosses":31,"closeGames":71,"closeLuck":6.69,"compositeLuck":5.54,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2024":{"wins":76,"losses":86,"gamesPlayed":162,"runsScored":665,"runsAllowed":739,"pythExpectedWins":73.2,"pythLuck":2.8,"closeWins":38,"closeLosses":39,"closeGames":77,"closeLuck":1.88,"compositeLuck":2.43,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"},"2025":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":583,"runsAllowed":645,"pythExpectedWins":73.53,"pythLuck":-2.53,"closeWins":35,"closeLosses":41,"closeGames":76,"closeLuck":1.69,"compositeLuck":-0.84,"playoffOutcome":"MISSED","teamNameThatYear":"Pittsburgh Pirates"}}},{"id":135,"name":"San Diego Padres","abbreviation":"SD","league":"NL","division":"W","totalLuck":0.89,"avgLuck":0.09,"seasons":{"2016":{"wins":68,"losses":94,"gamesPlayed":162,"runsScored":686,"runsAllowed":770,"pythExpectedWins":72.47,"pythLuck":-4.47,"closeWins":31,"closeLosses":44,"closeGames":75,"closeLuck":-0.48,"compositeLuck":-2.87,"playoffOutcome":"MISSED","teamNameThatYear":"San Diego Padres"},"2017":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":604,"runsAllowed":816,"pythExpectedWins":59.25,"pythLuck":11.75,"closeWins":31,"closeLosses":33,"closeGames":64,"closeLuck":2.95,"compositeLuck":8.23,"playoffOutcome":"MISSED","teamNameThatYear":"San Diego Padres"},"2018":{"wins":66,"losses":96,"gamesPlayed":162,"runsScored":617,"runsAllowed":767,"pythExpectedWins":65.08,"pythLuck":0.92,"closeWins":31,"closeLosses":37,"closeGames":68,"closeLuck":3.3,"compositeLuck":1.87,"playoffOutcome":"MISSED","teamNameThatYear":"San Diego Padres"},"2019":{"wins":70,"losses":92,"gamesPlayed":162,"runsScored":682,"runsAllowed":789,"pythExpectedWins":70.26,"pythLuck":-0.26,"closeWins":39,"closeLosses":42,"closeGames":81,"closeLuck":4.0,"compositeLuck":1.44,"playoffOutcome":"MISSED","teamNameThatYear":"San Diego Padres"},"2020":{"wins":37,"losses":23,"gamesPlayed":60,"runsScored":325,"runsAllowed":241,"pythExpectedWins":38.01,"pythLuck":-1.01,"closeWins":14,"closeLosses":12,"closeGames":26,"closeLuck":-2.03,"compositeLuck":-1.42,"playoffOutcome":"DS","teamNameThatYear":"San Diego Padres"},"2021":{"wins":79,"losses":83,"gamesPlayed":162,"runsScored":729,"runsAllowed":708,"pythExpectedWins":83.17,"pythLuck":-4.17,"closeWins":38,"closeLosses":41,"closeGames":79,"closeLuck":-0.52,"compositeLuck":-2.71,"playoffOutcome":"MISSED","teamNameThatYear":"San Diego Padres"},"2022":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":705,"runsAllowed":660,"pythExpectedWins":85.88,"pythLuck":3.12,"closeWins":41,"closeLosses":29,"closeGames":70,"closeLuck":2.54,"compositeLuck":2.89,"playoffOutcome":"LCS","teamNameThatYear":"San Diego Padres"},"2023":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":752,"runsAllowed":648,"pythExpectedWins":91.96,"pythLuck":-9.96,"closeWins":25,"closeLosses":42,"closeGames":67,"closeLuck":-8.91,"compositeLuck":-9.54,"playoffOutcome":"MISSED","teamNameThatYear":"San Diego Padres"},"2024":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":760,"runsAllowed":669,"pythExpectedWins":90.41,"pythLuck":2.59,"closeWins":40,"closeLosses":25,"closeGames":65,"closeLuck":2.69,"compositeLuck":2.63,"playoffOutcome":"DS","teamNameThatYear":"San Diego Padres"},"2025":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":702,"runsAllowed":621,"pythExpectedWins":90.05,"pythLuck":-0.05,"closeWins":46,"closeLosses":35,"closeGames":81,"closeLuck":1.0,"compositeLuck":0.37,"playoffOutcome":"WC","teamNameThatYear":"San Diego Padres"}}},{"id":137,"name":"San Francisco Giants","abbreviation":"SF","league":"NL","division":"W","totalLuck":5.34,"avgLuck":0.53,"seasons":{"2016":{"wins":87,"losses":75,"gamesPlayed":162,"runsScored":715,"runsAllowed":631,"pythExpectedWins":90.22,"pythLuck":-3.22,"closeWins":46,"closeLosses":43,"closeGames":89,"closeLuck":-1.8,"compositeLuck":-2.65,"playoffOutcome":"DS","teamNameThatYear":"San Francisco Giants"},"2017":{"wins":64,"losses":98,"gamesPlayed":162,"runsScored":639,"runsAllowed":776,"pythExpectedWins":66.75,"pythLuck":-2.75,"closeWins":34,"closeLosses":45,"closeGames":79,"closeLuck":2.79,"compositeLuck":-0.53,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"},"2018":{"wins":73,"losses":89,"gamesPlayed":162,"runsScored":603,"runsAllowed":699,"pythExpectedWins":70.12,"pythLuck":2.88,"closeWins":42,"closeLosses":48,"closeGames":90,"closeLuck":1.44,"compositeLuck":2.3,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"},"2019":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":678,"runsAllowed":773,"pythExpectedWins":71.33,"pythLuck":5.67,"closeWins":46,"closeLosses":36,"closeGames":82,"closeLuck":7.02,"compositeLuck":6.21,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"},"2020":{"wins":29,"losses":31,"gamesPlayed":60,"runsScored":299,"runsAllowed":297,"pythExpectedWins":30.18,"pythLuck":-1.18,"closeWins":13,"closeLosses":13,"closeGames":26,"closeLuck":0.43,"compositeLuck":-0.54,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"},"2021":{"wins":107,"losses":55,"gamesPlayed":162,"runsScored":804,"runsAllowed":594,"pythExpectedWins":102.88,"pythLuck":4.12,"closeWins":51,"closeLosses":30,"closeGames":81,"closeLuck":-2.5,"compositeLuck":1.47,"playoffOutcome":"DS","teamNameThatYear":"San Francisco Giants"},"2022":{"wins":81,"losses":81,"gamesPlayed":162,"runsScored":716,"runsAllowed":697,"pythExpectedWins":82.99,"pythLuck":-1.99,"closeWins":40,"closeLosses":41,"closeGames":81,"closeLuck":-0.5,"compositeLuck":-1.39,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"},"2023":{"wins":79,"losses":83,"gamesPlayed":162,"runsScored":674,"runsAllowed":719,"pythExpectedWins":76.22,"pythLuck":2.78,"closeWins":43,"closeLosses":29,"closeGames":72,"closeLuck":7.89,"compositeLuck":4.82,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"},"2024":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":693,"runsAllowed":699,"pythExpectedWins":80.36,"pythLuck":-0.36,"closeWins":39,"closeLosses":45,"closeGames":84,"closeLuck":-2.48,"compositeLuck":-1.21,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"},"2025":{"wins":81,"losses":81,"gamesPlayed":162,"runsScored":705,"runsAllowed":684,"pythExpectedWins":83.24,"pythLuck":-2.24,"closeWins":41,"closeLosses":50,"closeGames":91,"closeLuck":-4.5,"compositeLuck":-3.14,"playoffOutcome":"MISSED","teamNameThatYear":"San Francisco Giants"}}},{"id":136,"name":"Seattle Mariners","abbreviation":"SEA","league":"AL","division":"W","totalLuck":17.15,"avgLuck":1.71,"seasons":{"2016":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":768,"runsAllowed":707,"pythExpectedWins":87.12,"pythLuck":-1.12,"closeWins":42,"closeLosses":40,"closeGames":82,"closeLuck":-1.53,"compositeLuck":-1.28,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2017":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":750,"runsAllowed":772,"pythExpectedWins":78.86,"pythLuck":-0.86,"closeWins":39,"closeLosses":35,"closeGames":74,"closeLuck":3.37,"compositeLuck":0.83,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2018":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":677,"runsAllowed":711,"pythExpectedWins":77.37,"pythLuck":11.63,"closeWins":54,"closeLosses":28,"closeGames":82,"closeLuck":8.95,"compositeLuck":10.56,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2019":{"wins":68,"losses":94,"gamesPlayed":162,"runsScored":758,"runsAllowed":893,"pythExpectedWins":68.94,"pythLuck":-0.94,"closeWins":32,"closeLosses":44,"closeGames":76,"closeLuck":0.1,"compositeLuck":-0.52,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2020":{"wins":27,"losses":33,"gamesPlayed":60,"runsScored":254,"runsAllowed":303,"pythExpectedWins":25.2,"pythLuck":1.8,"closeWins":11,"closeLosses":13,"closeGames":24,"closeLuck":0.2,"compositeLuck":1.16,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2021":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":697,"runsAllowed":748,"pythExpectedWins":75.77,"pythLuck":14.23,"closeWins":52,"closeLosses":32,"closeGames":84,"closeLuck":5.33,"compositeLuck":10.67,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2022":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":690,"runsAllowed":623,"pythExpectedWins":88.55,"pythLuck":1.45,"closeWins":46,"closeLosses":39,"closeGames":85,"closeLuck":-1.22,"compositeLuck":0.38,"playoffOutcome":"DS","teamNameThatYear":"Seattle Mariners"},"2023":{"wins":88,"losses":74,"gamesPlayed":162,"runsScored":758,"runsAllowed":659,"pythExpectedWins":91.32,"pythLuck":-3.32,"closeWins":42,"closeLosses":40,"closeGames":82,"closeLuck":-2.54,"compositeLuck":-3.01,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2024":{"wins":85,"losses":77,"gamesPlayed":162,"runsScored":676,"runsAllowed":607,"pythExpectedWins":88.95,"pythLuck":-3.95,"closeWins":39,"closeLosses":42,"closeGames":81,"closeLuck":-3.5,"compositeLuck":-3.77,"playoffOutcome":"MISSED","teamNameThatYear":"Seattle Mariners"},"2025":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":766,"runsAllowed":694,"pythExpectedWins":88.3,"pythLuck":1.7,"closeWins":50,"closeLosses":35,"closeGames":85,"closeLuck":2.78,"compositeLuck":2.13,"playoffOutcome":"LCS","teamNameThatYear":"Seattle Mariners"}}},{"id":138,"name":"St. Louis Cardinals","abbreviation":"STL","league":"NL","division":"C","totalLuck":5.67,"avgLuck":0.57,"seasons":{"2016":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":779,"runsAllowed":712,"pythExpectedWins":87.65,"pythLuck":-1.65,"closeWins":34,"closeLosses":36,"closeGames":70,"closeLuck":-3.16,"compositeLuck":-2.25,"playoffOutcome":"MISSED","teamNameThatYear":"St. Louis Cardinals"},"2017":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":761,"runsAllowed":705,"pythExpectedWins":86.66,"pythLuck":-3.66,"closeWins":36,"closeLosses":41,"closeGames":77,"closeLuck":-3.45,"compositeLuck":-3.58,"playoffOutcome":"MISSED","teamNameThatYear":"St. Louis Cardinals"},"2018":{"wins":88,"losses":74,"gamesPlayed":162,"runsScored":759,"runsAllowed":691,"pythExpectedWins":87.94,"pythLuck":0.06,"closeWins":40,"closeLosses":32,"closeGames":72,"closeLuck":0.89,"compositeLuck":0.39,"playoffOutcome":"MISSED","teamNameThatYear":"St. Louis Cardinals"},"2019":{"wins":91,"losses":71,"gamesPlayed":162,"runsScored":764,"runsAllowed":662,"pythExpectedWins":91.56,"pythLuck":-0.56,"closeWins":41,"closeLosses":38,"closeGames":79,"closeLuck":-3.38,"compositeLuck":-1.69,"playoffOutcome":"LCS","teamNameThatYear":"St. Louis Cardinals"},"2020":{"wins":30,"losses":28,"gamesPlayed":58,"runsScored":240,"runsAllowed":229,"pythExpectedWins":30.24,"pythLuck":-0.24,"closeWins":13,"closeLosses":10,"closeGames":23,"closeLuck":1.1,"compositeLuck":0.3,"playoffOutcome":"WC","teamNameThatYear":"St. Louis Cardinals"},"2021":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":706,"runsAllowed":672,"pythExpectedWins":84.66,"pythLuck":5.34,"closeWins":42,"closeLosses":29,"closeGames":71,"closeLuck":2.56,"compositeLuck":4.23,"playoffOutcome":"WC","teamNameThatYear":"St. Louis Cardinals"},"2022":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":772,"runsAllowed":637,"pythExpectedWins":95.1,"pythLuck":-2.1,"closeWins":42,"closeLosses":32,"closeGames":74,"closeLuck":-0.48,"compositeLuck":-1.45,"playoffOutcome":"WC","teamNameThatYear":"St. Louis Cardinals"},"2023":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":719,"runsAllowed":829,"pythExpectedWins":70.51,"pythLuck":0.49,"closeWins":30,"closeLosses":38,"closeGames":68,"closeLuck":0.2,"compositeLuck":0.37,"playoffOutcome":"MISSED","teamNameThatYear":"St. Louis Cardinals"},"2024":{"wins":83,"losses":79,"gamesPlayed":162,"runsScored":672,"runsAllowed":719,"pythExpectedWins":76.0,"pythLuck":7.0,"closeWins":42,"closeLosses":35,"closeGames":77,"closeLuck":2.55,"compositeLuck":5.22,"playoffOutcome":"MISSED","teamNameThatYear":"St. Louis Cardinals"},"2025":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":689,"runsAllowed":754,"pythExpectedWins":74.33,"pythLuck":3.67,"closeWins":39,"closeLosses":32,"closeGames":71,"closeLuck":4.81,"compositeLuck":4.13,"playoffOutcome":"MISSED","teamNameThatYear":"St. Louis Cardinals"}}},{"id":139,"name":"Tampa Bay Rays","abbreviation":"TB","league":"AL","division":"E","totalLuck":-7.26,"avgLuck":-0.73,"seasons":{"2016":{"wins":68,"losses":94,"gamesPlayed":162,"runsScored":672,"runsAllowed":713,"pythExpectedWins":76.61,"pythLuck":-8.61,"closeWins":31,"closeLosses":43,"closeGames":74,"closeLuck":-0.06,"compositeLuck":-5.19,"playoffOutcome":"MISSED","teamNameThatYear":"Tampa Bay Rays"},"2017":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":694,"runsAllowed":704,"pythExpectedWins":79.94,"pythLuck":0.06,"closeWins":41,"closeLosses":36,"closeGames":77,"closeLuck":2.98,"compositeLuck":1.23,"playoffOutcome":"MISSED","teamNameThatYear":"Tampa Bay Rays"},"2018":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":716,"runsAllowed":646,"pythExpectedWins":88.6,"pythLuck":1.4,"closeWins":45,"closeLosses":36,"closeGames":81,"closeLuck":0.0,"compositeLuck":0.84,"playoffOutcome":"MISSED","teamNameThatYear":"Tampa Bay Rays"},"2019":{"wins":96,"losses":66,"gamesPlayed":162,"runsScored":769,"runsAllowed":656,"pythExpectedWins":92.7,"pythLuck":3.3,"closeWins":40,"closeLosses":33,"closeGames":73,"closeLuck":-3.26,"compositeLuck":0.68,"playoffOutcome":"DS","teamNameThatYear":"Tampa Bay Rays"},"2020":{"wins":40,"losses":20,"gamesPlayed":60,"runsScored":289,"runsAllowed":229,"pythExpectedWins":36.29,"pythLuck":3.71,"closeWins":24,"closeLosses":10,"closeGames":34,"closeLuck":1.33,"compositeLuck":2.76,"playoffOutcome":"PENNANT","teamNameThatYear":"Tampa Bay Rays"},"2021":{"wins":100,"losses":62,"gamesPlayed":162,"runsScored":857,"runsAllowed":651,"pythExpectedWins":100.96,"pythLuck":-0.96,"closeWins":38,"closeLosses":38,"closeGames":76,"closeLuck":-8.91,"compositeLuck":-4.14,"playoffOutcome":"DS","teamNameThatYear":"Tampa Bay Rays"},"2022":{"wins":86,"losses":76,"gamesPlayed":162,"runsScored":666,"runsAllowed":614,"pythExpectedWins":87.01,"pythLuck":-1.01,"closeWins":42,"closeLosses":43,"closeGames":85,"closeLuck":-3.12,"compositeLuck":-1.85,"playoffOutcome":"WC","teamNameThatYear":"Tampa Bay Rays"},"2023":{"wins":99,"losses":63,"gamesPlayed":162,"runsScored":860,"runsAllowed":665,"pythExpectedWins":99.71,"pythLuck":-0.71,"closeWins":35,"closeLosses":35,"closeGames":70,"closeLuck":-7.78,"compositeLuck":-3.54,"playoffOutcome":"WC","teamNameThatYear":"Tampa Bay Rays"},"2024":{"wins":80,"losses":82,"gamesPlayed":162,"runsScored":604,"runsAllowed":663,"pythExpectedWins":74.11,"pythLuck":5.89,"closeWins":54,"closeLosses":35,"closeGames":89,"closeLuck":10.05,"compositeLuck":7.55,"playoffOutcome":"MISSED","teamNameThatYear":"Tampa Bay Rays"},"2025":{"wins":77,"losses":85,"gamesPlayed":162,"runsScored":714,"runsAllowed":683,"pythExpectedWins":84.29,"pythLuck":-7.29,"closeWins":34,"closeLosses":44,"closeGames":78,"closeLuck":-3.07,"compositeLuck":-5.6,"playoffOutcome":"MISSED","teamNameThatYear":"Tampa Bay Rays"}}},{"id":140,"name":"Texas Rangers","abbreviation":"TEX","league":"AL","division":"W","totalLuck":-8.53,"avgLuck":-0.85,"seasons":{"2016":{"wins":95,"losses":67,"gamesPlayed":162,"runsScored":765,"runsAllowed":757,"pythExpectedWins":81.78,"pythLuck":13.22,"closeWins":50,"closeLosses":27,"closeGames":77,"closeLuck":4.85,"compositeLuck":9.87,"playoffOutcome":"DS","teamNameThatYear":"Texas Rangers"},"2017":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":799,"runsAllowed":816,"pythExpectedWins":79.44,"pythLuck":-1.44,"closeWins":29,"closeLosses":37,"closeGames":66,"closeLuck":-2.78,"compositeLuck":-1.98,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"},"2018":{"wins":67,"losses":95,"gamesPlayed":162,"runsScored":737,"runsAllowed":848,"pythExpectedWins":70.66,"pythLuck":-3.66,"closeWins":27,"closeLosses":39,"closeGames":66,"closeLuck":-0.3,"compositeLuck":-2.32,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"},"2019":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":810,"runsAllowed":878,"pythExpectedWins":75.04,"pythLuck":2.96,"closeWins":36,"closeLosses":36,"closeGames":72,"closeLuck":1.33,"compositeLuck":2.31,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"},"2020":{"wins":22,"losses":38,"gamesPlayed":60,"runsScored":224,"runsAllowed":312,"pythExpectedWins":21.17,"pythLuck":0.83,"closeWins":10,"closeLosses":11,"closeGames":21,"closeLuck":2.3,"compositeLuck":1.42,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"},"2021":{"wins":60,"losses":102,"gamesPlayed":162,"runsScored":625,"runsAllowed":815,"pythExpectedWins":61.71,"pythLuck":-1.71,"closeWins":28,"closeLosses":39,"closeGames":67,"closeLuck":3.19,"compositeLuck":0.25,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"},"2022":{"wins":68,"losses":94,"gamesPlayed":162,"runsScored":707,"runsAllowed":743,"pythExpectedWins":77.32,"pythLuck":-9.32,"closeWins":33,"closeLosses":53,"closeGames":86,"closeLuck":-3.1,"compositeLuck":-6.83,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"},"2023":{"wins":90,"losses":72,"gamesPlayed":162,"runsScored":881,"runsAllowed":716,"pythExpectedWins":96.19,"pythLuck":-6.19,"closeWins":28,"closeLosses":39,"closeGames":67,"closeLuck":-9.22,"compositeLuck":-7.4,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Texas Rangers"},"2024":{"wins":78,"losses":84,"gamesPlayed":162,"runsScored":683,"runsAllowed":738,"pythExpectedWins":75.27,"pythLuck":2.73,"closeWins":41,"closeLosses":34,"closeGames":75,"closeLuck":4.89,"compositeLuck":3.59,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"},"2025":{"wins":81,"losses":81,"gamesPlayed":162,"runsScored":684,"runsAllowed":605,"pythExpectedWins":90.06,"pythLuck":-9.06,"closeWins":34,"closeLosses":44,"closeGames":78,"closeLuck":-5.0,"compositeLuck":-7.44,"playoffOutcome":"MISSED","teamNameThatYear":"Texas Rangers"}}},{"id":141,"name":"Toronto Blue Jays","abbreviation":"TOR","league":"AL","division":"E","totalLuck":0.36,"avgLuck":0.04,"seasons":{"2016":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":759,"runsAllowed":666,"pythExpectedWins":90.64,"pythLuck":-1.64,"closeWins":42,"closeLosses":43,"closeGames":85,"closeLuck":-4.7,"compositeLuck":-2.86,"playoffOutcome":"LCS","teamNameThatYear":"Toronto Blue Jays"},"2017":{"wins":76,"losses":86,"gamesPlayed":162,"runsScored":693,"runsAllowed":784,"pythExpectedWins":71.89,"pythLuck":4.11,"closeWins":40,"closeLosses":43,"closeGames":83,"closeLuck":1.06,"compositeLuck":2.89,"playoffOutcome":"MISSED","teamNameThatYear":"Toronto Blue Jays"},"2018":{"wins":73,"losses":89,"gamesPlayed":162,"runsScored":709,"runsAllowed":832,"pythExpectedWins":69.23,"pythLuck":3.77,"closeWins":38,"closeLosses":29,"closeGames":67,"closeLuck":7.81,"compositeLuck":5.39,"playoffOutcome":"MISSED","teamNameThatYear":"Toronto Blue Jays"},"2019":{"wins":67,"losses":95,"gamesPlayed":162,"runsScored":726,"runsAllowed":828,"pythExpectedWins":71.3,"pythLuck":-4.3,"closeWins":32,"closeLosses":40,"closeGames":72,"closeLuck":2.22,"compositeLuck":-1.69,"playoffOutcome":"MISSED","teamNameThatYear":"Toronto Blue Jays"},"2020":{"wins":32,"losses":28,"gamesPlayed":60,"runsScored":302,"runsAllowed":312,"pythExpectedWins":29.11,"pythLuck":2.89,"closeWins":16,"closeLosses":18,"closeGames":34,"closeLuck":-2.13,"compositeLuck":0.88,"playoffOutcome":"WC","teamNameThatYear":"Toronto Blue Jays"},"2021":{"wins":91,"losses":71,"gamesPlayed":162,"runsScored":846,"runsAllowed":663,"pythExpectedWins":98.77,"pythLuck":-7.77,"closeWins":30,"closeLosses":33,"closeGames":63,"closeLuck":-5.39,"compositeLuck":-6.82,"playoffOutcome":"MISSED","teamNameThatYear":"Toronto Blue Jays"},"2022":{"wins":92,"losses":70,"gamesPlayed":162,"runsScored":775,"runsAllowed":679,"pythExpectedWins":90.75,"pythLuck":1.25,"closeWins":39,"closeLosses":32,"closeGames":71,"closeLuck":-1.32,"compositeLuck":0.22,"playoffOutcome":"WC","teamNameThatYear":"Toronto Blue Jays"},"2023":{"wins":89,"losses":73,"gamesPlayed":162,"runsScored":746,"runsAllowed":671,"pythExpectedWins":88.83,"pythLuck":0.17,"closeWins":34,"closeLosses":35,"closeGames":69,"closeLuck":-3.91,"compositeLuck":-1.46,"playoffOutcome":"WC","teamNameThatYear":"Toronto Blue Jays"},"2024":{"wins":74,"losses":88,"gamesPlayed":162,"runsScored":671,"runsAllowed":743,"pythExpectedWins":73.47,"pythLuck":0.53,"closeWins":35,"closeLosses":42,"closeGames":77,"closeLuck":-0.17,"compositeLuck":0.25,"playoffOutcome":"MISSED","teamNameThatYear":"Toronto Blue Jays"},"2025":{"wins":94,"losses":68,"gamesPlayed":162,"runsScored":798,"runsAllowed":721,"pythExpectedWins":88.5,"pythLuck":5.5,"closeWins":43,"closeLosses":30,"closeGames":73,"closeLuck":0.64,"compositeLuck":3.56,"playoffOutcome":"PENNANT","teamNameThatYear":"Toronto Blue Jays"}}},{"id":120,"name":"Washington Nationals","abbreviation":"WSH","league":"NL","division":"E","totalLuck":-3.2,"avgLuck":-0.32,"seasons":{"2016":{"wins":95,"losses":67,"gamesPlayed":162,"runsScored":763,"runsAllowed":612,"pythExpectedWins":97.13,"pythLuck":-2.13,"closeWins":43,"closeLosses":34,"closeGames":77,"closeLuck":-2.15,"compositeLuck":-2.14,"playoffOutcome":"DS","teamNameThatYear":"Washington Nationals"},"2017":{"wins":97,"losses":65,"gamesPlayed":162,"runsScored":819,"runsAllowed":672,"pythExpectedWins":95.5,"pythLuck":1.5,"closeWins":46,"closeLosses":32,"closeGames":78,"closeLuck":-0.7,"compositeLuck":0.62,"playoffOutcome":"DS","teamNameThatYear":"Washington Nationals"},"2018":{"wins":82,"losses":80,"gamesPlayed":162,"runsScored":771,"runsAllowed":682,"pythExpectedWins":90.05,"pythLuck":-8.05,"closeWins":40,"closeLosses":46,"closeGames":86,"closeLuck":-3.53,"compositeLuck":-6.24,"playoffOutcome":"MISSED","teamNameThatYear":"Washington Nationals"},"2019":{"wins":93,"losses":69,"gamesPlayed":162,"runsScored":873,"runsAllowed":724,"pythExpectedWins":94.74,"pythLuck":-1.74,"closeWins":31,"closeLosses":35,"closeGames":66,"closeLuck":-6.89,"compositeLuck":-3.8,"playoffOutcome":"WS_CHAMP","teamNameThatYear":"Washington Nationals"},"2020":{"wins":26,"losses":34,"gamesPlayed":60,"runsScored":293,"runsAllowed":301,"pythExpectedWins":29.26,"pythLuck":-3.26,"closeWins":12,"closeLosses":14,"closeGames":26,"closeLuck":0.73,"compositeLuck":-1.66,"playoffOutcome":"MISSED","teamNameThatYear":"Washington Nationals"},"2021":{"wins":65,"losses":97,"gamesPlayed":162,"runsScored":724,"runsAllowed":820,"pythExpectedWins":71.81,"pythLuck":-6.81,"closeWins":35,"closeLosses":46,"closeGames":81,"closeLuck":2.5,"compositeLuck":-3.09,"playoffOutcome":"MISSED","teamNameThatYear":"Washington Nationals"},"2022":{"wins":55,"losses":107,"gamesPlayed":162,"runsScored":603,"runsAllowed":855,"pythExpectedWins":55.97,"pythLuck":-0.97,"closeWins":27,"closeLosses":37,"closeGames":64,"closeLuck":5.27,"compositeLuck":1.53,"playoffOutcome":"MISSED","teamNameThatYear":"Washington Nationals"},"2023":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":700,"runsAllowed":845,"pythExpectedWins":67.18,"pythLuck":3.82,"closeWins":40,"closeLosses":38,"closeGames":78,"closeLuck":5.81,"compositeLuck":4.62,"playoffOutcome":"MISSED","teamNameThatYear":"Washington Nationals"},"2024":{"wins":71,"losses":91,"gamesPlayed":162,"runsScored":660,"runsAllowed":764,"pythExpectedWins":70.22,"pythLuck":0.78,"closeWins":32,"closeLosses":37,"closeGames":69,"closeLuck":1.76,"compositeLuck":1.17,"playoffOutcome":"MISSED","teamNameThatYear":"Washington Nationals"},"2025":{"wins":66,"losses":96,"gamesPlayed":162,"runsScored":687,"runsAllowed":899,"pythExpectedWins":61.46,"pythLuck":4.54,"closeWins":37,"closeLosses":35,"closeGames":72,"closeLuck":7.67,"compositeLuck":5.79,"playoffOutcome":"MISSED","teamNameThatYear":"Washington Nationals"}}}]};
+  allData = data;
+  luckNeutralMap   = buildStandingsMap(data, true);
+  actualSeedingMap = buildStandingsMap(data, false);
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('table-container').style.display = 'block';
+  document.getElementById('footnote').style.display = 'block';
+  renderTable();
+})();
 </script>
 </body>
 </html>

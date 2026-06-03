@@ -1,8 +1,7 @@
 {
   "metadata": {
-    "generated": "2026-04-05T18:17:36.448315Z",
+    "generated": "2026-04-05T20:57:32.826356Z",
     "seasons": [
-      2015,
       2016,
       2017,
       2018,
@@ -11,7 +10,8 @@
       2021,
       2022,
       2023,
-      2024
+      2024,
+      2025
     ]
   },
   "teams": [
@@ -19,25 +19,11 @@
       "id": 109,
       "name": "Arizona Diamondbacks",
       "abbreviation": "ARI",
-      "totalLuck": -17.24,
-      "avgLuck": -1.72,
+      "league": "NL",
+      "division": "W",
+      "totalLuck": -17.14,
+      "avgLuck": -1.71,
       "seasons": {
-        "2015": {
-          "wins": 79,
-          "losses": 83,
-          "gamesPlayed": 162,
-          "runsScored": 720,
-          "runsAllowed": 713,
-          "pythExpectedWins": 81.72,
-          "pythLuck": -2.72,
-          "closeWins": 40,
-          "closeLosses": 42,
-          "closeGames": 82,
-          "closeLuck": 0.01,
-          "compositeLuck": -1.63,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Arizona Diamondbacks"
-        },
         "2016": {
           "wins": 69,
           "losses": 93,
@@ -181,6 +167,22 @@
           "compositeLuck": -0.83,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Arizona Diamondbacks"
+        },
+        "2025": {
+          "wins": 80,
+          "losses": 82,
+          "gamesPlayed": 162,
+          "runsScored": 791,
+          "runsAllowed": 785,
+          "pythExpectedWins": 81.56,
+          "pythLuck": -1.56,
+          "closeWins": 39,
+          "closeLosses": 43,
+          "closeGames": 82,
+          "closeLuck": -1.49,
+          "compositeLuck": -1.53,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Arizona Diamondbacks"
         }
       }
     },
@@ -188,25 +190,11 @@
       "id": 133,
       "name": "Athletics",
       "abbreviation": "ATH",
-      "totalLuck": 3.36,
-      "avgLuck": 0.34,
+      "league": "AL",
+      "division": "W",
+      "totalLuck": 12.85,
+      "avgLuck": 1.28,
       "seasons": {
-        "2015": {
-          "wins": 68,
-          "losses": 94,
-          "gamesPlayed": 162,
-          "runsScored": 694,
-          "runsAllowed": 729,
-          "pythExpectedWins": 77.36,
-          "pythLuck": -9.36,
-          "closeWins": 31,
-          "closeLosses": 53,
-          "closeGames": 84,
-          "closeLuck": -4.26,
-          "compositeLuck": -7.32,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Oakland Athletics"
-        },
         "2016": {
           "wins": 69,
           "losses": 93,
@@ -350,6 +338,22 @@
           "compositeLuck": 2.09,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Oakland Athletics"
+        },
+        "2025": {
+          "wins": 76,
+          "losses": 86,
+          "gamesPlayed": 162,
+          "runsScored": 733,
+          "runsAllowed": 817,
+          "pythExpectedWins": 72.99,
+          "pythLuck": 3.01,
+          "closeWins": 30,
+          "closeLosses": 32,
+          "closeGames": 62,
+          "closeLuck": 0.91,
+          "compositeLuck": 2.17,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Athletics"
         }
       }
     },
@@ -357,25 +361,11 @@
       "id": 144,
       "name": "Atlanta Braves",
       "abbreviation": "ATL",
-      "totalLuck": 2.63,
-      "avgLuck": 0.26,
+      "league": "NL",
+      "division": "E",
+      "totalLuck": -9.73,
+      "avgLuck": -0.97,
       "seasons": {
-        "2015": {
-          "wins": 67,
-          "losses": 95,
-          "gamesPlayed": 162,
-          "runsScored": 573,
-          "runsAllowed": 760,
-          "pythExpectedWins": 60.52,
-          "pythLuck": 6.48,
-          "closeWins": 44,
-          "closeLosses": 38,
-          "closeGames": 82,
-          "closeLuck": 10.09,
-          "compositeLuck": 7.92,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Atlanta Braves"
-        },
         "2016": {
           "wins": 68,
           "losses": 93,
@@ -519,6 +509,22 @@
           "compositeLuck": -4.19,
           "playoffOutcome": "WC",
           "teamNameThatYear": "Atlanta Braves"
+        },
+        "2025": {
+          "wins": 76,
+          "losses": 86,
+          "gamesPlayed": 162,
+          "runsScored": 724,
+          "runsAllowed": 734,
+          "pythExpectedWins": 79.98,
+          "pythLuck": -3.98,
+          "closeWins": 31,
+          "closeLosses": 46,
+          "closeGames": 77,
+          "closeLuck": -5.12,
+          "compositeLuck": -4.44,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Atlanta Braves"
         }
       }
     },
@@ -526,25 +532,11 @@
       "id": 110,
       "name": "Baltimore Orioles",
       "abbreviation": "BAL",
-      "totalLuck": 3.12,
-      "avgLuck": 0.31,
+      "league": "AL",
+      "division": "E",
+      "totalLuck": 11.07,
+      "avgLuck": 1.11,
       "seasons": {
-        "2015": {
-          "wins": 81,
-          "losses": 81,
-          "gamesPlayed": 162,
-          "runsScored": 713,
-          "runsAllowed": 693,
-          "pythExpectedWins": 83.11,
-          "pythLuck": -2.11,
-          "closeWins": 38,
-          "closeLosses": 45,
-          "closeGames": 83,
-          "closeLuck": -3.5,
-          "compositeLuck": -2.67,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Baltimore Orioles"
-        },
         "2016": {
           "wins": 89,
           "losses": 73,
@@ -688,6 +680,22 @@
           "compositeLuck": 0.58,
           "playoffOutcome": "WC",
           "teamNameThatYear": "Baltimore Orioles"
+        },
+        "2025": {
+          "wins": 75,
+          "losses": 87,
+          "gamesPlayed": 162,
+          "runsScored": 677,
+          "runsAllowed": 788,
+          "pythExpectedWins": 69.82,
+          "pythLuck": 5.18,
+          "closeWins": 36,
+          "closeLosses": 30,
+          "closeGames": 66,
+          "closeLuck": 5.44,
+          "compositeLuck": 5.28,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Baltimore Orioles"
         }
       }
     },
@@ -695,25 +703,11 @@
       "id": 111,
       "name": "Boston Red Sox",
       "abbreviation": "BOS",
-      "totalLuck": -5.52,
-      "avgLuck": -0.55,
+      "league": "AL",
+      "division": "E",
+      "totalLuck": -5.77,
+      "avgLuck": -0.58,
       "seasons": {
-        "2015": {
-          "wins": 78,
-          "losses": 84,
-          "gamesPlayed": 162,
-          "runsScored": 748,
-          "runsAllowed": 753,
-          "pythExpectedWins": 80.51,
-          "pythLuck": -2.51,
-          "closeWins": 36,
-          "closeLosses": 39,
-          "closeGames": 75,
-          "closeLuck": -0.11,
-          "compositeLuck": -1.55,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Boston Red Sox"
-        },
         "2016": {
           "wins": 93,
           "losses": 69,
@@ -857,6 +851,22 @@
           "compositeLuck": 0.96,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Boston Red Sox"
+        },
+        "2025": {
+          "wins": 89,
+          "losses": 73,
+          "gamesPlayed": 162,
+          "runsScored": 786,
+          "runsAllowed": 676,
+          "pythExpectedWins": 92.1,
+          "pythLuck": -3.1,
+          "closeWins": 43,
+          "closeLosses": 35,
+          "closeGames": 78,
+          "closeLuck": 0.15,
+          "compositeLuck": -1.8,
+          "playoffOutcome": "WC",
+          "teamNameThatYear": "Boston Red Sox"
         }
       }
     },
@@ -864,25 +874,11 @@
       "id": 112,
       "name": "Chicago Cubs",
       "abbreviation": "CHC",
-      "totalLuck": -16.0,
-      "avgLuck": -1.6,
+      "league": "NL",
+      "division": "C",
+      "totalLuck": -23.87,
+      "avgLuck": -2.39,
       "seasons": {
-        "2015": {
-          "wins": 97,
-          "losses": 65,
-          "gamesPlayed": 162,
-          "runsScored": 689,
-          "runsAllowed": 608,
-          "pythExpectedWins": 90.23,
-          "pythLuck": 6.77,
-          "closeWins": 51,
-          "closeLosses": 30,
-          "closeGames": 81,
-          "closeLuck": 2.5,
-          "compositeLuck": 5.06,
-          "playoffOutcome": "LCS",
-          "teamNameThatYear": "Chicago Cubs"
-        },
         "2016": {
           "wins": 103,
           "losses": 58,
@@ -1026,6 +1022,22 @@
           "compositeLuck": -4.02,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Chicago Cubs"
+        },
+        "2025": {
+          "wins": 92,
+          "losses": 70,
+          "gamesPlayed": 162,
+          "runsScored": 793,
+          "runsAllowed": 649,
+          "pythExpectedWins": 95.69,
+          "pythLuck": -3.69,
+          "closeWins": 36,
+          "closeLosses": 30,
+          "closeGames": 66,
+          "closeLuck": -1.48,
+          "compositeLuck": -2.81,
+          "playoffOutcome": "DS",
+          "teamNameThatYear": "Chicago Cubs"
         }
       }
     },
@@ -1033,25 +1045,11 @@
       "id": 145,
       "name": "Chicago White Sox",
       "abbreviation": "CWS",
-      "totalLuck": 1.38,
-      "avgLuck": 0.14,
+      "league": "AL",
+      "division": "C",
+      "totalLuck": -11.39,
+      "avgLuck": -1.14,
       "seasons": {
-        "2015": {
-          "wins": 76,
-          "losses": 86,
-          "gamesPlayed": 162,
-          "runsScored": 622,
-          "runsAllowed": 701,
-          "pythExpectedWins": 72.17,
-          "pythLuck": 3.83,
-          "closeWins": 46,
-          "closeLosses": 46,
-          "closeGames": 92,
-          "closeLuck": 2.84,
-          "compositeLuck": 3.43,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Chicago White Sox"
-        },
         "2016": {
           "wins": 78,
           "losses": 84,
@@ -1195,6 +1193,22 @@
           "compositeLuck": -3.61,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Chicago White Sox"
+        },
+        "2025": {
+          "wins": 60,
+          "losses": 102,
+          "gamesPlayed": 162,
+          "runsScored": 647,
+          "runsAllowed": 742,
+          "pythExpectedWins": 70.9,
+          "pythLuck": -10.9,
+          "closeWins": 23,
+          "closeLosses": 58,
+          "closeGames": 81,
+          "closeLuck": -7.0,
+          "compositeLuck": -9.34,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Chicago White Sox"
         }
       }
     },
@@ -1202,25 +1216,11 @@
       "id": 113,
       "name": "Cincinnati Reds",
       "abbreviation": "CIN",
-      "totalLuck": -12.37,
-      "avgLuck": -1.24,
+      "league": "NL",
+      "division": "C",
+      "totalLuck": -10.87,
+      "avgLuck": -1.09,
       "seasons": {
-        "2015": {
-          "wins": 64,
-          "losses": 98,
-          "gamesPlayed": 162,
-          "runsScored": 640,
-          "runsAllowed": 754,
-          "pythExpectedWins": 68.94,
-          "pythLuck": -4.94,
-          "closeWins": 27,
-          "closeLosses": 46,
-          "closeGames": 73,
-          "closeLuck": -1.84,
-          "compositeLuck": -3.7,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Cincinnati Reds"
-        },
         "2016": {
           "wins": 68,
           "losses": 94,
@@ -1364,6 +1364,22 @@
           "compositeLuck": -5.46,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Cincinnati Reds"
+        },
+        "2025": {
+          "wins": 83,
+          "losses": 79,
+          "gamesPlayed": 162,
+          "runsScored": 716,
+          "runsAllowed": 681,
+          "pythExpectedWins": 84.71,
+          "pythLuck": -1.71,
+          "closeWins": 36,
+          "closeLosses": 40,
+          "closeGames": 76,
+          "closeLuck": -2.94,
+          "compositeLuck": -2.2,
+          "playoffOutcome": "WC",
+          "teamNameThatYear": "Cincinnati Reds"
         }
       }
     },
@@ -1371,25 +1387,11 @@
       "id": 114,
       "name": "Cleveland Guardians",
       "abbreviation": "CLE",
-      "totalLuck": -7.05,
-      "avgLuck": -0.71,
+      "league": "AL",
+      "division": "C",
+      "totalLuck": 0.45,
+      "avgLuck": 0.05,
       "seasons": {
-        "2015": {
-          "wins": 81,
-          "losses": 80,
-          "gamesPlayed": 161,
-          "runsScored": 669,
-          "runsAllowed": 640,
-          "pythExpectedWins": 83.76,
-          "pythLuck": -2.76,
-          "closeWins": 36,
-          "closeLosses": 33,
-          "closeGames": 69,
-          "closeLuck": 1.29,
-          "compositeLuck": -1.14,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Cleveland Indians"
-        },
         "2016": {
           "wins": 94,
           "losses": 67,
@@ -1533,6 +1535,22 @@
           "compositeLuck": 1.25,
           "playoffOutcome": "LCS",
           "teamNameThatYear": "Cleveland Guardians"
+        },
+        "2025": {
+          "wins": 88,
+          "losses": 74,
+          "gamesPlayed": 162,
+          "runsScored": 643,
+          "runsAllowed": 649,
+          "pythExpectedWins": 80.31,
+          "pythLuck": 7.69,
+          "closeWins": 50,
+          "closeLosses": 34,
+          "closeGames": 84,
+          "closeLuck": 4.37,
+          "compositeLuck": 6.36,
+          "playoffOutcome": "WC",
+          "teamNameThatYear": "Cleveland Guardians"
         }
       }
     },
@@ -1540,25 +1558,11 @@
       "id": 115,
       "name": "Colorado Rockies",
       "abbreviation": "COL",
-      "totalLuck": 14.88,
-      "avgLuck": 1.49,
+      "league": "NL",
+      "division": "W",
+      "totalLuck": 18.77,
+      "avgLuck": 1.88,
       "seasons": {
-        "2015": {
-          "wins": 68,
-          "losses": 94,
-          "gamesPlayed": 162,
-          "runsScored": 737,
-          "runsAllowed": 844,
-          "pythExpectedWins": 71.0,
-          "pythLuck": -3.0,
-          "closeWins": 35,
-          "closeLosses": 42,
-          "closeGames": 77,
-          "closeLuck": 2.68,
-          "compositeLuck": -0.73,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Colorado Rockies"
-        },
         "2016": {
           "wins": 75,
           "losses": 87,
@@ -1702,6 +1706,22 @@
           "compositeLuck": 5.65,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Colorado Rockies"
+        },
+        "2025": {
+          "wins": 43,
+          "losses": 119,
+          "gamesPlayed": 162,
+          "runsScored": 597,
+          "runsAllowed": 1021,
+          "pythExpectedWins": 44.14,
+          "pythLuck": -1.14,
+          "closeWins": 29,
+          "closeLosses": 44,
+          "closeGames": 73,
+          "closeLuck": 9.62,
+          "compositeLuck": 3.16,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Colorado Rockies"
         }
       }
     },
@@ -1709,25 +1729,11 @@
       "id": 116,
       "name": "Detroit Tigers",
       "abbreviation": "DET",
-      "totalLuck": 20.41,
-      "avgLuck": 2.04,
+      "league": "AL",
+      "division": "C",
+      "totalLuck": 17.19,
+      "avgLuck": 1.72,
       "seasons": {
-        "2015": {
-          "wins": 74,
-          "losses": 87,
-          "gamesPlayed": 161,
-          "runsScored": 689,
-          "runsAllowed": 803,
-          "pythExpectedWins": 69.3,
-          "pythLuck": 4.7,
-          "closeWins": 36,
-          "closeLosses": 37,
-          "closeGames": 73,
-          "closeLuck": 2.45,
-          "compositeLuck": 3.8,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Detroit Tigers"
-        },
         "2016": {
           "wins": 86,
           "losses": 75,
@@ -1871,6 +1877,22 @@
           "compositeLuck": 0.55,
           "playoffOutcome": "DS",
           "teamNameThatYear": "Detroit Tigers"
+        },
+        "2025": {
+          "wins": 87,
+          "losses": 75,
+          "gamesPlayed": 162,
+          "runsScored": 758,
+          "runsAllowed": 691,
+          "pythExpectedWins": 87.84,
+          "pythLuck": -0.84,
+          "closeWins": 36,
+          "closeLosses": 26,
+          "closeGames": 62,
+          "closeLuck": 2.7,
+          "compositeLuck": 0.58,
+          "playoffOutcome": "DS",
+          "teamNameThatYear": "Detroit Tigers"
         }
       }
     },
@@ -1878,25 +1900,11 @@
       "id": 117,
       "name": "Houston Astros",
       "abbreviation": "HOU",
-      "totalLuck": -33.76,
-      "avgLuck": -3.38,
+      "league": "AL",
+      "division": "W",
+      "totalLuck": -22.93,
+      "avgLuck": -2.29,
       "seasons": {
-        "2015": {
-          "wins": 86,
-          "losses": 76,
-          "gamesPlayed": 162,
-          "runsScored": 729,
-          "runsAllowed": 618,
-          "pythExpectedWins": 93.15,
-          "pythLuck": -7.15,
-          "closeWins": 37,
-          "closeLosses": 47,
-          "closeGames": 84,
-          "closeLuck": -7.59,
-          "compositeLuck": -7.33,
-          "playoffOutcome": "DS",
-          "teamNameThatYear": "Houston Astros"
-        },
         "2016": {
           "wins": 84,
           "losses": 78,
@@ -2040,6 +2048,22 @@
           "compositeLuck": -4.51,
           "playoffOutcome": "WC",
           "teamNameThatYear": "Houston Astros"
+        },
+        "2025": {
+          "wins": 87,
+          "losses": 75,
+          "gamesPlayed": 162,
+          "runsScored": 686,
+          "runsAllowed": 665,
+          "pythExpectedWins": 83.3,
+          "pythLuck": 3.7,
+          "closeWins": 44,
+          "closeLosses": 32,
+          "closeGames": 76,
+          "closeLuck": 3.19,
+          "compositeLuck": 3.5,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Houston Astros"
         }
       }
     },
@@ -2047,25 +2071,11 @@
       "id": 118,
       "name": "Kansas City Royals",
       "abbreviation": "KC",
-      "totalLuck": 8.75,
-      "avgLuck": 0.88,
+      "league": "AL",
+      "division": "C",
+      "totalLuck": 5.74,
+      "avgLuck": 0.57,
       "seasons": {
-        "2015": {
-          "wins": 95,
-          "losses": 67,
-          "gamesPlayed": 162,
-          "runsScored": 724,
-          "runsAllowed": 641,
-          "pythExpectedWins": 89.99,
-          "pythLuck": 5.01,
-          "closeWins": 44,
-          "closeLosses": 30,
-          "closeGames": 74,
-          "closeLuck": 0.6,
-          "compositeLuck": 3.25,
-          "playoffOutcome": "WS_CHAMP",
-          "teamNameThatYear": "Kansas City Royals"
-        },
         "2016": {
           "wins": 81,
           "losses": 81,
@@ -2209,6 +2219,22 @@
           "compositeLuck": -5.08,
           "playoffOutcome": "DS",
           "teamNameThatYear": "Kansas City Royals"
+        },
+        "2025": {
+          "wins": 82,
+          "losses": 80,
+          "gamesPlayed": 162,
+          "runsScored": 651,
+          "runsAllowed": 637,
+          "pythExpectedWins": 82.61,
+          "pythLuck": -0.61,
+          "closeWins": 41,
+          "closeLosses": 37,
+          "closeGames": 78,
+          "closeLuck": 1.52,
+          "compositeLuck": 0.24,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Kansas City Royals"
         }
       }
     },
@@ -2216,25 +2242,11 @@
       "id": 108,
       "name": "Los Angeles Angels",
       "abbreviation": "LAA",
-      "totalLuck": 2.11,
-      "avgLuck": 0.21,
+      "league": "AL",
+      "division": "W",
+      "totalLuck": 2.32,
+      "avgLuck": 0.23,
       "seasons": {
-        "2015": {
-          "wins": 85,
-          "losses": 77,
-          "gamesPlayed": 162,
-          "runsScored": 661,
-          "runsAllowed": 675,
-          "pythExpectedWins": 79.45,
-          "pythLuck": 5.55,
-          "closeWins": 47,
-          "closeLosses": 33,
-          "closeGames": 80,
-          "closeLuck": 5.02,
-          "compositeLuck": 5.34,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Los Angeles Angels"
-        },
         "2016": {
           "wins": 74,
           "losses": 88,
@@ -2378,6 +2390,22 @@
           "compositeLuck": -0.8,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Los Angeles Angels"
+        },
+        "2025": {
+          "wins": 72,
+          "losses": 90,
+          "gamesPlayed": 162,
+          "runsScored": 673,
+          "runsAllowed": 837,
+          "pythExpectedWins": 65.05,
+          "pythLuck": 6.95,
+          "closeWins": 35,
+          "closeLosses": 36,
+          "closeGames": 71,
+          "closeLuck": 3.44,
+          "compositeLuck": 5.55,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Los Angeles Angels"
         }
       }
     },
@@ -2385,25 +2413,11 @@
       "id": 119,
       "name": "Los Angeles Dodgers",
       "abbreviation": "LAD",
-      "totalLuck": -26.83,
-      "avgLuck": -2.68,
+      "league": "NL",
+      "division": "W",
+      "totalLuck": -30.88,
+      "avgLuck": -3.09,
       "seasons": {
-        "2015": {
-          "wins": 92,
-          "losses": 70,
-          "gamesPlayed": 162,
-          "runsScored": 667,
-          "runsAllowed": 595,
-          "pythExpectedWins": 89.44,
-          "pythLuck": 2.56,
-          "closeWins": 43,
-          "closeLosses": 39,
-          "closeGames": 82,
-          "closeLuck": -3.57,
-          "compositeLuck": 0.11,
-          "playoffOutcome": "DS",
-          "teamNameThatYear": "Los Angeles Dodgers"
-        },
         "2016": {
           "wins": 91,
           "losses": 71,
@@ -2547,6 +2561,22 @@
           "compositeLuck": -0.62,
           "playoffOutcome": "WS_CHAMP",
           "teamNameThatYear": "Los Angeles Dodgers"
+        },
+        "2025": {
+          "wins": 93,
+          "losses": 69,
+          "gamesPlayed": 162,
+          "runsScored": 825,
+          "runsAllowed": 683,
+          "pythExpectedWins": 94.86,
+          "pythLuck": -1.86,
+          "closeWins": 36,
+          "closeLosses": 39,
+          "closeGames": 75,
+          "closeLuck": -7.06,
+          "compositeLuck": -3.94,
+          "playoffOutcome": "WS_CHAMP",
+          "teamNameThatYear": "Los Angeles Dodgers"
         }
       }
     },
@@ -2554,25 +2584,11 @@
       "id": 146,
       "name": "Miami Marlins",
       "abbreviation": "MIA",
-      "totalLuck": 9.98,
-      "avgLuck": 1.0,
+      "league": "NL",
+      "division": "E",
+      "totalLuck": 18.07,
+      "avgLuck": 1.81,
       "seasons": {
-        "2015": {
-          "wins": 71,
-          "losses": 91,
-          "gamesPlayed": 162,
-          "runsScored": 613,
-          "runsAllowed": 678,
-          "pythExpectedWins": 73.55,
-          "pythLuck": -2.55,
-          "closeWins": 31,
-          "closeLosses": 45,
-          "closeGames": 76,
-          "closeLuck": -2.31,
-          "compositeLuck": -2.45,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Miami Marlins"
-        },
         "2016": {
           "wins": 79,
           "losses": 82,
@@ -2716,6 +2732,22 @@
           "compositeLuck": 2.82,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Miami Marlins"
+        },
+        "2025": {
+          "wins": 79,
+          "losses": 83,
+          "gamesPlayed": 162,
+          "runsScored": 709,
+          "runsAllowed": 798,
+          "pythExpectedWins": 72.27,
+          "pythLuck": 6.73,
+          "closeWins": 44,
+          "closeLosses": 38,
+          "closeGames": 82,
+          "closeLuck": 4.01,
+          "compositeLuck": 5.64,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Miami Marlins"
         }
       }
     },
@@ -2723,25 +2755,11 @@
       "id": 158,
       "name": "Milwaukee Brewers",
       "abbreviation": "MIL",
-      "totalLuck": 9.16,
-      "avgLuck": 0.92,
+      "league": "NL",
+      "division": "C",
+      "totalLuck": 9.52,
+      "avgLuck": 0.95,
       "seasons": {
-        "2015": {
-          "wins": 68,
-          "losses": 94,
-          "gamesPlayed": 162,
-          "runsScored": 655,
-          "runsAllowed": 737,
-          "pythExpectedWins": 72.29,
-          "pythLuck": -4.29,
-          "closeWins": 26,
-          "closeLosses": 37,
-          "closeGames": 63,
-          "closeLuck": -0.44,
-          "compositeLuck": -2.75,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Milwaukee Brewers"
-        },
         "2016": {
           "wins": 73,
           "losses": 89,
@@ -2885,6 +2903,22 @@
           "compositeLuck": -2.55,
           "playoffOutcome": "WC",
           "teamNameThatYear": "Milwaukee Brewers"
+        },
+        "2025": {
+          "wins": 97,
+          "losses": 65,
+          "gamesPlayed": 162,
+          "runsScored": 806,
+          "runsAllowed": 634,
+          "pythExpectedWins": 98.51,
+          "pythLuck": -1.51,
+          "closeWins": 40,
+          "closeLosses": 33,
+          "closeGames": 73,
+          "closeLuck": -3.71,
+          "compositeLuck": -2.39,
+          "playoffOutcome": "LCS",
+          "teamNameThatYear": "Milwaukee Brewers"
         }
       }
     },
@@ -2892,25 +2926,11 @@
       "id": 142,
       "name": "Minnesota Twins",
       "abbreviation": "MIN",
-      "totalLuck": -4.49,
-      "avgLuck": -0.45,
+      "league": "AL",
+      "division": "C",
+      "totalLuck": -9.12,
+      "avgLuck": -0.91,
       "seasons": {
-        "2015": {
-          "wins": 83,
-          "losses": 79,
-          "gamesPlayed": 162,
-          "runsScored": 696,
-          "runsAllowed": 700,
-          "pythExpectedWins": 80.58,
-          "pythLuck": 2.42,
-          "closeWins": 41,
-          "closeLosses": 34,
-          "closeGames": 75,
-          "closeLuck": 2.57,
-          "compositeLuck": 2.48,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Minnesota Twins"
-        },
         "2016": {
           "wins": 59,
           "losses": 103,
@@ -3054,6 +3074,22 @@
           "compositeLuck": 0.21,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Minnesota Twins"
+        },
+        "2025": {
+          "wins": 70,
+          "losses": 92,
+          "gamesPlayed": 162,
+          "runsScored": 678,
+          "runsAllowed": 773,
+          "pythExpectedWins": 71.33,
+          "pythLuck": -1.33,
+          "closeWins": 26,
+          "closeLosses": 42,
+          "closeGames": 68,
+          "closeLuck": -3.38,
+          "compositeLuck": -2.15,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Minnesota Twins"
         }
       }
     },
@@ -3061,25 +3097,11 @@
       "id": 121,
       "name": "New York Mets",
       "abbreviation": "NYM",
-      "totalLuck": -3.04,
-      "avgLuck": -0.3,
+      "league": "NL",
+      "division": "E",
+      "totalLuck": -5.89,
+      "avgLuck": -0.59,
       "seasons": {
-        "2015": {
-          "wins": 90,
-          "losses": 72,
-          "gamesPlayed": 162,
-          "runsScored": 683,
-          "runsAllowed": 613,
-          "pythExpectedWins": 88.99,
-          "pythLuck": 1.01,
-          "closeWins": 44,
-          "closeLosses": 37,
-          "closeGames": 81,
-          "closeLuck": -1.0,
-          "compositeLuck": 0.21,
-          "playoffOutcome": "PENNANT",
-          "teamNameThatYear": "New York Mets"
-        },
         "2016": {
           "wins": 87,
           "losses": 75,
@@ -3223,6 +3245,22 @@
           "compositeLuck": 1.66,
           "playoffOutcome": "LCS",
           "teamNameThatYear": "New York Mets"
+        },
+        "2025": {
+          "wins": 83,
+          "losses": 79,
+          "gamesPlayed": 162,
+          "runsScored": 766,
+          "runsAllowed": 715,
+          "pythExpectedWins": 86.1,
+          "pythLuck": -3.1,
+          "closeWins": 37,
+          "closeLosses": 39,
+          "closeGames": 76,
+          "closeLuck": -1.94,
+          "compositeLuck": -2.64,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "New York Mets"
         }
       }
     },
@@ -3230,25 +3268,11 @@
       "id": 147,
       "name": "New York Yankees",
       "abbreviation": "NYY",
-      "totalLuck": -7.15,
-      "avgLuck": -0.72,
+      "league": "AL",
+      "division": "E",
+      "totalLuck": -11.33,
+      "avgLuck": -1.13,
       "seasons": {
-        "2015": {
-          "wins": 87,
-          "losses": 75,
-          "gamesPlayed": 162,
-          "runsScored": 764,
-          "runsAllowed": 698,
-          "pythExpectedWins": 87.68,
-          "pythLuck": -0.68,
-          "closeWins": 42,
-          "closeLosses": 34,
-          "closeGames": 76,
-          "closeLuck": 1.19,
-          "compositeLuck": 0.07,
-          "playoffOutcome": "WC",
-          "teamNameThatYear": "New York Yankees"
-        },
         "2016": {
           "wins": 84,
           "losses": 78,
@@ -3392,6 +3416,22 @@
           "compositeLuck": -3.3,
           "playoffOutcome": "PENNANT",
           "teamNameThatYear": "New York Yankees"
+        },
+        "2025": {
+          "wins": 94,
+          "losses": 68,
+          "gamesPlayed": 162,
+          "runsScored": 849,
+          "runsAllowed": 685,
+          "pythExpectedWins": 96.71,
+          "pythLuck": -2.71,
+          "closeWins": 35,
+          "closeLosses": 36,
+          "closeGames": 71,
+          "closeLuck": -6.2,
+          "compositeLuck": -4.11,
+          "playoffOutcome": "DS",
+          "teamNameThatYear": "New York Yankees"
         }
       }
     },
@@ -3399,25 +3439,11 @@
       "id": 143,
       "name": "Philadelphia Phillies",
       "abbreviation": "PHI",
-      "totalLuck": 11.39,
-      "avgLuck": 1.14,
+      "league": "NL",
+      "division": "E",
+      "totalLuck": 9.37,
+      "avgLuck": 0.94,
       "seasons": {
-        "2015": {
-          "wins": 63,
-          "losses": 99,
-          "gamesPlayed": 162,
-          "runsScored": 626,
-          "runsAllowed": 809,
-          "pythExpectedWins": 62.33,
-          "pythLuck": 0.67,
-          "closeWins": 32,
-          "closeLosses": 40,
-          "closeGames": 72,
-          "closeLuck": 4.0,
-          "compositeLuck": 2.0,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Philadelphia Phillies"
-        },
         "2016": {
           "wins": 71,
           "losses": 91,
@@ -3561,6 +3587,22 @@
           "compositeLuck": 1.71,
           "playoffOutcome": "DS",
           "teamNameThatYear": "Philadelphia Phillies"
+        },
+        "2025": {
+          "wins": 96,
+          "losses": 66,
+          "gamesPlayed": 162,
+          "runsScored": 778,
+          "runsAllowed": 648,
+          "pythExpectedWins": 94.43,
+          "pythLuck": 1.57,
+          "closeWins": 45,
+          "closeLosses": 35,
+          "closeGames": 80,
+          "closeLuck": -2.41,
+          "compositeLuck": -0.02,
+          "playoffOutcome": "DS",
+          "teamNameThatYear": "Philadelphia Phillies"
         }
       }
     },
@@ -3568,25 +3610,11 @@
       "id": 134,
       "name": "Pittsburgh Pirates",
       "abbreviation": "PIT",
-      "totalLuck": 22.9,
-      "avgLuck": 2.29,
+      "league": "NL",
+      "division": "C",
+      "totalLuck": 17.88,
+      "avgLuck": 1.79,
       "seasons": {
-        "2015": {
-          "wins": 98,
-          "losses": 64,
-          "gamesPlayed": 162,
-          "runsScored": 697,
-          "runsAllowed": 596,
-          "pythExpectedWins": 92.52,
-          "pythLuck": 5.48,
-          "closeWins": 47,
-          "closeLosses": 27,
-          "closeGames": 74,
-          "closeLuck": 2.23,
-          "compositeLuck": 4.18,
-          "playoffOutcome": "WC",
-          "teamNameThatYear": "Pittsburgh Pirates"
-        },
         "2016": {
           "wins": 78,
           "losses": 83,
@@ -3730,6 +3758,22 @@
           "compositeLuck": 2.43,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Pittsburgh Pirates"
+        },
+        "2025": {
+          "wins": 71,
+          "losses": 91,
+          "gamesPlayed": 162,
+          "runsScored": 583,
+          "runsAllowed": 645,
+          "pythExpectedWins": 73.53,
+          "pythLuck": -2.53,
+          "closeWins": 35,
+          "closeLosses": 41,
+          "closeGames": 76,
+          "closeLuck": 1.69,
+          "compositeLuck": -0.84,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Pittsburgh Pirates"
         }
       }
     },
@@ -3737,25 +3781,11 @@
       "id": 135,
       "name": "San Diego Padres",
       "abbreviation": "SD",
-      "totalLuck": 4.07,
-      "avgLuck": 0.41,
+      "league": "NL",
+      "division": "W",
+      "totalLuck": 0.89,
+      "avgLuck": 0.09,
       "seasons": {
-        "2015": {
-          "wins": 74,
-          "losses": 88,
-          "gamesPlayed": 162,
-          "runsScored": 650,
-          "runsAllowed": 731,
-          "pythExpectedWins": 72.33,
-          "pythLuck": 1.67,
-          "closeWins": 42,
-          "closeLosses": 36,
-          "closeGames": 78,
-          "closeLuck": 6.37,
-          "compositeLuck": 3.55,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "San Diego Padres"
-        },
         "2016": {
           "wins": 68,
           "losses": 94,
@@ -3899,6 +3929,22 @@
           "compositeLuck": 2.63,
           "playoffOutcome": "DS",
           "teamNameThatYear": "San Diego Padres"
+        },
+        "2025": {
+          "wins": 90,
+          "losses": 72,
+          "gamesPlayed": 162,
+          "runsScored": 702,
+          "runsAllowed": 621,
+          "pythExpectedWins": 90.05,
+          "pythLuck": -0.05,
+          "closeWins": 46,
+          "closeLosses": 35,
+          "closeGames": 81,
+          "closeLuck": 1.0,
+          "compositeLuck": 0.37,
+          "playoffOutcome": "WC",
+          "teamNameThatYear": "San Diego Padres"
         }
       }
     },
@@ -3906,25 +3952,11 @@
       "id": 137,
       "name": "San Francisco Giants",
       "abbreviation": "SF",
-      "totalLuck": 3.24,
-      "avgLuck": 0.32,
+      "league": "NL",
+      "division": "W",
+      "totalLuck": 5.34,
+      "avgLuck": 0.53,
       "seasons": {
-        "2015": {
-          "wins": 84,
-          "losses": 78,
-          "gamesPlayed": 162,
-          "runsScored": 696,
-          "runsAllowed": 627,
-          "pythExpectedWins": 88.71,
-          "pythLuck": -4.71,
-          "closeWins": 37,
-          "closeLosses": 46,
-          "closeGames": 83,
-          "closeLuck": -6.04,
-          "compositeLuck": -5.24,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "San Francisco Giants"
-        },
         "2016": {
           "wins": 87,
           "losses": 75,
@@ -4068,6 +4100,22 @@
           "compositeLuck": -1.21,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "San Francisco Giants"
+        },
+        "2025": {
+          "wins": 81,
+          "losses": 81,
+          "gamesPlayed": 162,
+          "runsScored": 705,
+          "runsAllowed": 684,
+          "pythExpectedWins": 83.24,
+          "pythLuck": -2.24,
+          "closeWins": 41,
+          "closeLosses": 50,
+          "closeGames": 91,
+          "closeLuck": -4.5,
+          "compositeLuck": -3.14,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "San Francisco Giants"
         }
       }
     },
@@ -4075,25 +4123,11 @@
       "id": 136,
       "name": "Seattle Mariners",
       "abbreviation": "SEA",
-      "totalLuck": 16.64,
-      "avgLuck": 1.66,
+      "league": "AL",
+      "division": "W",
+      "totalLuck": 17.15,
+      "avgLuck": 1.71,
       "seasons": {
-        "2015": {
-          "wins": 76,
-          "losses": 86,
-          "gamesPlayed": 162,
-          "runsScored": 656,
-          "runsAllowed": 726,
-          "pythExpectedWins": 73.51,
-          "pythLuck": 2.49,
-          "closeWins": 43,
-          "closeLosses": 48,
-          "closeGames": 91,
-          "closeLuck": 0.31,
-          "compositeLuck": 1.62,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Seattle Mariners"
-        },
         "2016": {
           "wins": 86,
           "losses": 76,
@@ -4237,6 +4271,22 @@
           "compositeLuck": -3.77,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Seattle Mariners"
+        },
+        "2025": {
+          "wins": 90,
+          "losses": 72,
+          "gamesPlayed": 162,
+          "runsScored": 766,
+          "runsAllowed": 694,
+          "pythExpectedWins": 88.3,
+          "pythLuck": 1.7,
+          "closeWins": 50,
+          "closeLosses": 35,
+          "closeGames": 85,
+          "closeLuck": 2.78,
+          "compositeLuck": 2.13,
+          "playoffOutcome": "LCS",
+          "teamNameThatYear": "Seattle Mariners"
         }
       }
     },
@@ -4244,25 +4294,11 @@
       "id": 138,
       "name": "St. Louis Cardinals",
       "abbreviation": "STL",
-      "totalLuck": 2.52,
-      "avgLuck": 0.25,
+      "league": "NL",
+      "division": "C",
+      "totalLuck": 5.67,
+      "avgLuck": 0.57,
       "seasons": {
-        "2015": {
-          "wins": 100,
-          "losses": 62,
-          "gamesPlayed": 162,
-          "runsScored": 647,
-          "runsAllowed": 525,
-          "pythExpectedWins": 96.3,
-          "pythLuck": 3.7,
-          "closeWins": 50,
-          "closeLosses": 36,
-          "closeGames": 86,
-          "closeLuck": -3.09,
-          "compositeLuck": 0.98,
-          "playoffOutcome": "DS",
-          "teamNameThatYear": "St. Louis Cardinals"
-        },
         "2016": {
           "wins": 86,
           "losses": 76,
@@ -4406,6 +4442,22 @@
           "compositeLuck": 5.22,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "St. Louis Cardinals"
+        },
+        "2025": {
+          "wins": 78,
+          "losses": 84,
+          "gamesPlayed": 162,
+          "runsScored": 689,
+          "runsAllowed": 754,
+          "pythExpectedWins": 74.33,
+          "pythLuck": 3.67,
+          "closeWins": 39,
+          "closeLosses": 32,
+          "closeGames": 71,
+          "closeLuck": 4.81,
+          "compositeLuck": 4.13,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "St. Louis Cardinals"
         }
       }
     },
@@ -4413,25 +4465,11 @@
       "id": 139,
       "name": "Tampa Bay Rays",
       "abbreviation": "TB",
-      "totalLuck": -2.57,
-      "avgLuck": -0.26,
+      "league": "AL",
+      "division": "E",
+      "totalLuck": -7.26,
+      "avgLuck": -0.73,
       "seasons": {
-        "2015": {
-          "wins": 80,
-          "losses": 82,
-          "gamesPlayed": 162,
-          "runsScored": 644,
-          "runsAllowed": 642,
-          "pythExpectedWins": 81.23,
-          "pythLuck": -1.23,
-          "closeWins": 46,
-          "closeLosses": 48,
-          "closeGames": 94,
-          "closeLuck": -0.42,
-          "compositeLuck": -0.91,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Tampa Bay Rays"
-        },
         "2016": {
           "wins": 68,
           "losses": 94,
@@ -4575,6 +4613,22 @@
           "compositeLuck": 7.55,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Tampa Bay Rays"
+        },
+        "2025": {
+          "wins": 77,
+          "losses": 85,
+          "gamesPlayed": 162,
+          "runsScored": 714,
+          "runsAllowed": 683,
+          "pythExpectedWins": 84.29,
+          "pythLuck": -7.29,
+          "closeWins": 34,
+          "closeLosses": 44,
+          "closeGames": 78,
+          "closeLuck": -3.07,
+          "compositeLuck": -5.6,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Tampa Bay Rays"
         }
       }
     },
@@ -4582,25 +4636,11 @@
       "id": 140,
       "name": "Texas Rangers",
       "abbreviation": "TEX",
-      "totalLuck": 2.61,
-      "avgLuck": 0.26,
+      "league": "AL",
+      "division": "W",
+      "totalLuck": -8.53,
+      "avgLuck": -0.85,
       "seasons": {
-        "2015": {
-          "wins": 88,
-          "losses": 74,
-          "gamesPlayed": 162,
-          "runsScored": 751,
-          "runsAllowed": 733,
-          "pythExpectedWins": 82.8,
-          "pythLuck": 5.2,
-          "closeWins": 46,
-          "closeLosses": 36,
-          "closeGames": 82,
-          "closeLuck": 1.46,
-          "compositeLuck": 3.7,
-          "playoffOutcome": "DS",
-          "teamNameThatYear": "Texas Rangers"
-        },
         "2016": {
           "wins": 95,
           "losses": 67,
@@ -4744,6 +4784,22 @@
           "compositeLuck": 3.59,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Texas Rangers"
+        },
+        "2025": {
+          "wins": 81,
+          "losses": 81,
+          "gamesPlayed": 162,
+          "runsScored": 684,
+          "runsAllowed": 605,
+          "pythExpectedWins": 90.06,
+          "pythLuck": -9.06,
+          "closeWins": 34,
+          "closeLosses": 44,
+          "closeGames": 78,
+          "closeLuck": -5.0,
+          "compositeLuck": -7.44,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Texas Rangers"
         }
       }
     },
@@ -4751,25 +4807,11 @@
       "id": 141,
       "name": "Toronto Blue Jays",
       "abbreviation": "TOR",
-      "totalLuck": -12.93,
-      "avgLuck": -1.29,
+      "league": "AL",
+      "division": "E",
+      "totalLuck": 0.36,
+      "avgLuck": 0.04,
       "seasons": {
-        "2015": {
-          "wins": 93,
-          "losses": 69,
-          "gamesPlayed": 162,
-          "runsScored": 891,
-          "runsAllowed": 670,
-          "pythExpectedWins": 101.66,
-          "pythLuck": -8.66,
-          "closeWins": 30,
-          "closeLosses": 42,
-          "closeGames": 72,
-          "closeLuck": -11.33,
-          "compositeLuck": -9.73,
-          "playoffOutcome": "LCS",
-          "teamNameThatYear": "Toronto Blue Jays"
-        },
         "2016": {
           "wins": 89,
           "losses": 73,
@@ -4913,6 +4955,22 @@
           "compositeLuck": 0.25,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Toronto Blue Jays"
+        },
+        "2025": {
+          "wins": 94,
+          "losses": 68,
+          "gamesPlayed": 162,
+          "runsScored": 798,
+          "runsAllowed": 721,
+          "pythExpectedWins": 88.5,
+          "pythLuck": 5.5,
+          "closeWins": 43,
+          "closeLosses": 30,
+          "closeGames": 73,
+          "closeLuck": 0.64,
+          "compositeLuck": 3.56,
+          "playoffOutcome": "PENNANT",
+          "teamNameThatYear": "Toronto Blue Jays"
         }
       }
     },
@@ -4920,25 +4978,11 @@
       "id": 120,
       "name": "Washington Nationals",
       "abbreviation": "WSH",
-      "totalLuck": -13.06,
-      "avgLuck": -1.31,
+      "league": "NL",
+      "division": "E",
+      "totalLuck": -3.2,
+      "avgLuck": -0.32,
       "seasons": {
-        "2015": {
-          "wins": 83,
-          "losses": 79,
-          "gamesPlayed": 162,
-          "runsScored": 703,
-          "runsAllowed": 635,
-          "pythExpectedWins": 88.52,
-          "pythLuck": -5.52,
-          "closeWins": 35,
-          "closeLosses": 37,
-          "closeGames": 72,
-          "closeLuck": -1.89,
-          "compositeLuck": -4.07,
-          "playoffOutcome": "MISSED",
-          "teamNameThatYear": "Washington Nationals"
-        },
         "2016": {
           "wins": 95,
           "losses": 67,
@@ -5080,6 +5124,22 @@
           "closeGames": 69,
           "closeLuck": 1.76,
           "compositeLuck": 1.17,
+          "playoffOutcome": "MISSED",
+          "teamNameThatYear": "Washington Nationals"
+        },
+        "2025": {
+          "wins": 66,
+          "losses": 96,
+          "gamesPlayed": 162,
+          "runsScored": 687,
+          "runsAllowed": 899,
+          "pythExpectedWins": 61.46,
+          "pythLuck": 4.54,
+          "closeWins": 37,
+          "closeLosses": 35,
+          "closeGames": 72,
+          "closeLuck": 7.67,
+          "compositeLuck": 5.79,
           "playoffOutcome": "MISSED",
           "teamNameThatYear": "Washington Nationals"
         }

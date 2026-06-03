@@ -13,7 +13,7 @@ from datetime import datetime
 
 import requests
 
-SEASONS = list(range(2015, 2025))
+SEASONS = list(range(2016, 2026))
 BASE_URL = "https://statsapi.mlb.com/api/v1"
 
 # All 30 MLB team IDs → (canonical display name, abbreviation)
@@ -48,6 +48,41 @@ CANONICAL_NAMES = {
     146: ("Miami Marlins", "MIA"),
     147: ("New York Yankees", "NYY"),
     158: ("Milwaukee Brewers", "MIL"),
+}
+
+
+# team_id -> (league, division) — static across all seasons
+TEAM_DIVISIONS = {
+    108: ("AL", "W"),  # LAA
+    109: ("NL", "W"),  # ARI
+    110: ("AL", "E"),  # BAL
+    111: ("AL", "E"),  # BOS
+    112: ("NL", "C"),  # CHC
+    113: ("NL", "C"),  # CIN
+    114: ("AL", "C"),  # CLE
+    115: ("NL", "W"),  # COL
+    116: ("AL", "C"),  # DET
+    117: ("AL", "W"),  # HOU
+    118: ("AL", "C"),  # KC
+    119: ("NL", "W"),  # LAD
+    120: ("NL", "E"),  # WSH
+    121: ("NL", "E"),  # NYM
+    133: ("AL", "W"),  # ATH
+    134: ("NL", "C"),  # PIT
+    135: ("NL", "W"),  # SD
+    136: ("AL", "W"),  # SEA
+    137: ("NL", "W"),  # SF
+    138: ("NL", "C"),  # STL
+    139: ("AL", "E"),  # TB
+    140: ("AL", "W"),  # TEX
+    141: ("AL", "E"),  # TOR
+    142: ("AL", "C"),  # MIN
+    143: ("NL", "E"),  # PHI
+    144: ("NL", "E"),  # ATL
+    145: ("AL", "C"),  # CWS
+    146: ("NL", "E"),  # MIA
+    147: ("AL", "E"),  # NYY
+    158: ("NL", "C"),  # MIL
 }
 
 
@@ -334,10 +369,13 @@ def build_data():
 
         avg_luck = round(total_luck / seasons_with_data, 2) if seasons_with_data > 0 else 0.0
 
+        league, division = TEAM_DIVISIONS.get(team_id, ("?", "?"))
         teams_data.append({
             "id": team_id,
             "name": canonical_name,
             "abbreviation": abbrev,
+            "league": league,
+            "division": division,
             "totalLuck": round(total_luck, 2),
             "avgLuck": avg_luck,
             "seasons": seasons_data,
@@ -353,7 +391,7 @@ def build_data():
 
 
 def main():
-    print("Fetching MLB data for 2015–2024...")
+    print("Fetching MLB data for 2016–2025...")
     data = build_data()
 
     output_path = "data.json"
