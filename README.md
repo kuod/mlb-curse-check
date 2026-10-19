@@ -41,7 +41,7 @@ Both components are in the same units (wins), so they combine directly.
 |--------|---------|
 | Each season cell | Composite luck score, color-coded red (unlucky) → white → green (lucky) |
 | Playoff badge | Deepest postseason round reached that year |
-| Total | Sum of composite luck across all 10 seasons |
+| Total | Sum of composite luck across all 10 seasons (2016–2025) |
 | Avg/Yr | Average composite luck per season |
 
 Year headers are clickable to sort the table by that season's luck score.
@@ -71,6 +71,8 @@ All data is fetched from the **MLB Stats API** (free, public, no authentication 
 - Regular season schedule → game-by-game scores for close-game calculation
 - Postseason schedule → bracket results for playoff outcome classification
 
+Payroll figures in the payroll scatter are hand-entered Opening Day payrolls embedded in `index.html` (not from the MLB Stats API; source not recorded). Luck and standings data come from the API.
+
 The 2020 column is marked with `*` — that was a 60-game season, so luck values carry higher variance than normal years.
 
 ## Regenerating Data
@@ -80,7 +82,7 @@ pip install -r requirements.txt
 python fetch_data.py
 ```
 
-This fetches ~30 API calls (standings + schedule + postseason for each of 10 seasons) using a thread pool and writes `data.json`. Takes about 15–30 seconds.
+This fetches ~30 API calls (standings + schedule + postseason for each of 10 seasons) using a thread pool and writes `data.json` (and updates the inlined copy in `index.html`); it aborts without writing if any call fails. Takes about 15–30 seconds.
 
 ## Running Locally
 
@@ -89,7 +91,7 @@ python -m http.server 8000
 # open http://localhost:8000
 ```
 
-The site is a single `index.html` file that loads `data.json` at runtime. No build step required. A service worker (`sw.js`) caches assets for offline use.
+The site is a single `index.html` file with the data inlined; `python fetch_data.py` rewrites both `data.json` and the inlined copy. No build step required. `sw.js` (an offline cache) is present but not currently registered. Run tests with `python -m unittest discover -s tests`.
 
 ## Deploying to GitHub Pages
 

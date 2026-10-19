@@ -11,6 +11,9 @@ python fetch_data.py
 
 # Serve locally
 python -m http.server 8000
+
+# Run tests
+python -m unittest discover -s tests
 ```
 
 ## Architecture
@@ -19,9 +22,11 @@ This is a two-stage static site:
 
 1. **`fetch_data.py`** — fetches from the MLB Stats API and writes `data.json`. Three endpoints per season (standings, regular-season schedule, postseason schedule) fetched in parallel via `ThreadPoolExecutor`. Computes Pythagorean luck, close-game luck (≤2-run margin), and a composite score (0.6/0.4 weighted) for all 30 teams × 10 seasons. Team IDs are hardcoded in `CANONICAL_NAMES`.
 
-2. **`index.html`** — self-contained page (no framework, no build step) that loads `data.json` via `fetch()` and renders the table. All styling is inline `<style>`, all logic is inline `<script>`. Key JS functions: `luckToColor()` (HSL diverging scale), `badgeHtml()` (playoff badge), `buildTooltip()` (hover detail), `renderTable()` (full re-render on sort change).
+2. **`index.html`** — self-contained page (no framework, no build step) that renders the table from an inlined copy of the data (`const data = {...};` in the boot IIFE; `fetch_data.py` keeps it in sync with `data.json`). All styling is inline `<style>`, all logic is inline `<script>`. Key JS functions: `luckToColor()` (HSL diverging scale), `badgeHtml()` (playoff badge), `buildTooltip()` (hover detail), `renderTable()` (full re-render on sort change).
 
-`data.json` is committed so the site works without running the Python script.
+`data.json` is committed so the site works without running the Python script. `fetch_data.py` exits non-zero and leaves files untouched if any fetch fails or the dataset is incomplete.
+
+`index.html` also contains a hand-maintained `PAYROLL_DATA` table (Opening Day payroll, $M) used by the payroll scatter; it is not from the MLB Stats API and its source is not recorded. `sw.js` exists but is not currently registered by `index.html`.
 
 ## Luck Factor Formulas
 
@@ -39,12 +44,12 @@ Composite = 0.6 × pythagorean_luck + 0.4 × close_game_luck
 
 ```json
 {
-  "metadata": { "generated": "ISO-8601", "seasons": [2015..2024] },
+  "metadata": { "generated": "ISO-8601", "seasons": [2016..2025] },
   "teams": [{
     "id": 147, "name": "...", "abbreviation": "NYY",
     "totalLuck": -7.2, "avgLuck": -0.72,
     "seasons": {
-      "2024": {
+      "2025": {
         "wins", "losses", "gamesPlayed", "runsScored", "runsAllowed",
         "pythExpectedWins", "pythLuck",
         "closeWins", "closeLosses", "closeGames", "closeLuck",

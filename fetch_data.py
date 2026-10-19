@@ -9,7 +9,10 @@ import math
 import time
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
+from datetime import datetime, timezone
+import os
+import re
+import tempfile
 
 import requests
 
@@ -297,6 +300,7 @@ def build_data():
 
     # Parallel fetch
     futures = []
+    errors = []
     with ThreadPoolExecutor(max_workers=5) as executor:
         for year in SEASONS:
             futures.append(("standings", executor.submit(fetch_standings, year)))
@@ -314,6 +318,13 @@ def build_data():
                     postseason_by_year[yr] = result
             except Exception as e:
                 print(f"Error fetching {kind}: {e}", file=sys.stderr)
+                errors.append(f"{kind}: {e}")
+
+    if errors:
+        raise RuntimeError(
+            f"{len(errors)} fetch(es) failed; refusing to build partial data: "
+            + "; ".join(errors)
+        )
 
     # Build team-centric data
     teams_data = []
@@ -383,20 +394,57 @@ def build_data():
 
     return {
         "metadata": {
-            "generated": datetime.utcnow().isoformat() + "Z",
+            "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
             "seasons": SEASONS,
         },
         "teams": teams_data,
     }
 
 
+def validate(data):
+    """Raise ValueError if the dataset is incomplete."""
+    if len(data["teams"]) != len(CANONICAL_NAMES):
+        raise ValueError(f"expected {len(CANONICAL_NAMES)} teams, got {len(data['teams'])}")
+    for year in data["metadata"]["seasons"]:
+        n = sum(1 for t in data["teams"] if str(year) in t["seasons"])
+        if n != len(CANONICAL_NAMES):
+            raise ValueError(f"season {year}: only {n} teams have data")
+
+
+INLINE_RE = re.compile(r"^(\s*const data = ).*(;\s*)$", re.M)
+
+
+def inline_into_html(html, data):
+    """Replace the inlined `const data = {...};` line in index.html."""
+    payload = json.dumps(data, separators=(",", ":"))
+    new, n = INLINE_RE.subn(lambda m: m.group(1) + payload + m.group(2), html, count=1)
+    if n != 1:
+        raise ValueError("could not find inline 'const data = ...;' line in index.html")
+    return new
+
+
+def atomic_write(path, text):
+    d = os.path.dirname(os.path.abspath(path))
+    fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+    with os.fdopen(fd, "w") as f:
+        f.write(text)
+    os.replace(tmp, path)
+
+
 def main():
-    print("Fetching MLB data for 2016–2025...")
-    data = build_data()
+    print(f"Fetching MLB data for {SEASONS[0]}–{SEASONS[-1]}...")
+    try:
+        data = build_data()
+        validate(data)
+    except (RuntimeError, ValueError) as e:
+        print(f"ERROR: {e}\nLeaving data.json and index.html untouched.", file=sys.stderr)
+        sys.exit(1)
 
     output_path = "data.json"
-    with open(output_path, "w") as f:
-        json.dump(data, f, indent=2)
+    atomic_write(output_path, json.dumps(data, indent=2))
+    with open("index.html") as f:
+        html = f.read()
+    atomic_write("index.html", inline_into_html(html, data))
 
     print(f"\nWrote {output_path}")
     print(f"  {len(data['teams'])} teams")
@@ -404,7 +452,7 @@ def main():
     # Quick sanity check
     for team in data["teams"]:
         seasons_with_data = len(team["seasons"])
-        print(f"  {team['abbreviation']}: {seasons_with_data}/10 seasons, total luck: {team['totalLuck']:+.1f}")
+        print(f"  {team['abbreviation']}: {seasons_with_data}/{len(SEASONS)} seasons, total luck: {team['totalLuck']:+.1f}")
 
 
 if __name__ == "__main__":
