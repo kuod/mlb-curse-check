@@ -9,7 +9,7 @@ import math
 import time
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests
 
@@ -383,7 +383,7 @@ def build_data():
 
     return {
         "metadata": {
-            "generated": datetime.utcnow().isoformat() + "Z",
+            "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
             "seasons": SEASONS,
         },
         "teams": teams_data,
