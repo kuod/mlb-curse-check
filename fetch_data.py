@@ -6,13 +6,13 @@ Outputs data.json for the GitHub Pages site.
 
 import json
 import math
-import os
-import re
-import tempfile
 import time
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
+import os
+import re
+import tempfile
 
 import requests
 
@@ -411,6 +411,18 @@ def validate(data):
             raise ValueError(f"season {year}: only {n} teams have data")
 
 
+INLINE_RE = re.compile(r"^(\s*const data = ).*(;\s*)$", re.M)
+
+
+def inline_into_html(html, data):
+    """Replace the inlined `const data = {...};` line in index.html."""
+    payload = json.dumps(data, separators=(",", ":"))
+    new, n = INLINE_RE.subn(lambda m: m.group(1) + payload + m.group(2), html, count=1)
+    if n != 1:
+        raise ValueError("could not find inline 'const data = ...;' line in index.html")
+    return new
+
+
 def atomic_write(path, text):
     d = os.path.dirname(os.path.abspath(path))
     fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
@@ -425,11 +437,14 @@ def main():
         data = build_data()
         validate(data)
     except (RuntimeError, ValueError) as e:
-        print(f"ERROR: {e}\nLeaving data.json untouched.", file=sys.stderr)
+        print(f"ERROR: {e}\nLeaving data.json and index.html untouched.", file=sys.stderr)
         sys.exit(1)
 
     output_path = "data.json"
     atomic_write(output_path, json.dumps(data, indent=2))
+    with open("index.html") as f:
+        html = f.read()
+    atomic_write("index.html", inline_into_html(html, data))
 
     print(f"\nWrote {output_path}")
     print(f"  {len(data['teams'])} teams")
