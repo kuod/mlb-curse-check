@@ -20,7 +20,9 @@ python -m unittest discover -s tests
 
 This is a two-stage static site:
 
-1. **`fetch_data.py`** — fetches from the MLB Stats API and writes `data.json`. Three endpoints per season (standings, regular-season schedule, postseason schedule) fetched in parallel via `ThreadPoolExecutor`. Computes Pythagorean luck, close-game luck (≤2-run margin), and a composite score (0.6/0.4 weighted) for all 30 teams × 10 seasons. Team IDs are hardcoded in `CANONICAL_NAMES`.
+1. **`fetch_data.py`** — fetches from the MLB Stats API and writes `data.json`. Three endpoints per season (standings, regular-season schedule, postseason schedule) fetched in parallel via `ThreadPoolExecutor`. Computes Pythagorean luck, close-game luck (≤2-run margin), and a composite score (0.6/0.4 weighted) for all 30 teams × 10 seasons. Team IDs are hardcoded in `CANONICAL_NAMES`, and league/division assignments in a separate hardcoded `TEAM_DIVISIONS` table (both need updating if a team moves or relocates).
+
+   Known inconsistency: `index.html` `getLeague()` uses a hardcoded `AL_TEAMS` set rather than the `league` field that `data.json` already carries.
 
 2. **`index.html`** — self-contained page (no framework, no build step) that renders the table from an inlined copy of the data (`const data = {...};` in the boot IIFE; `fetch_data.py` keeps it in sync with `data.json`). All styling is inline `<style>`, all logic is inline `<script>`. Key JS functions: `luckToColor()` (HSL diverging scale), `badgeHtml()` (playoff badge), `buildTooltip()` (hover detail), `renderTable()` (full re-render on sort change).
 
