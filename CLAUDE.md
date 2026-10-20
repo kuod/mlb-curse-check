@@ -26,7 +26,7 @@ This is a two-stage static site:
 
 `data.json` is committed so the site works without running the Python script. `fetch_data.py` exits non-zero and leaves files untouched if any fetch fails or the dataset is incomplete.
 
-`index.html` also contains a hand-maintained `PAYROLL_DATA` table (Opening Day payroll, $M) used by the payroll scatter; it is not from the MLB Stats API and its source is not recorded. `sw.js` exists but is not currently registered by `index.html`.
+`index.html` also contains a hand-maintained `PAYROLL_DATA` table ($M, labelled "Opening Day" in the UI) used by the payroll scatter. It is not from the MLB Stats API. Its source and exact definition are unknown, so treat the figures as unsourced, approximate estimates; do not describe them as verified. A Baseball-Reference spot check (2026-10-19) found 39% of the 239 compared team-seasons differ by more than 10%; see the README's Data section for details. `sw.js` exists but is not currently registered by `index.html`.
 
 ## Luck Factor Formulas
 
@@ -47,6 +47,7 @@ Composite = 0.6 × pythagorean_luck + 0.4 × close_game_luck
   "metadata": { "generated": "ISO-8601", "seasons": [2016..2025] },
   "teams": [{
     "id": 147, "name": "...", "abbreviation": "NYY",
+    "league": "AL", "division": "E",
     "totalLuck": -7.2, "avgLuck": -0.72,
     "seasons": {
       "2025": {
