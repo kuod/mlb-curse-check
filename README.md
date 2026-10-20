@@ -1,8 +1,8 @@
 # MLB Luck Factor 2016–2025
 
-A static GitHub Pages site that quantifies how "lucky" each MLB team was each season, using two independent luck signals combined into a single composite score.
+A static site (designed to be hostable on GitHub Pages) that quantifies how "lucky" each MLB team was each season, using two independent luck signals combined into a single composite score.
 
-Live site: *(enable GitHub Pages on `main` / root after pushing)*
+Live site: none yet. GitHub Pages is not currently enabled for this repo. To view the app, clone the repo and open `index.html` in a browser (or run `python3 -m http.server` in the repo root and visit `http://localhost:8000`; the local server is needed for the service worker and `data.json` fetch).
 
 ## What is the Luck Factor?
 
