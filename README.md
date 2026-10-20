@@ -1,8 +1,8 @@
 # MLB Luck Factor 2016–2025
 
-A static GitHub Pages site that quantifies how "lucky" each MLB team was each season, using two independent luck signals combined into a single composite score.
+A static site (designed to be hostable on GitHub Pages) that quantifies how "lucky" each MLB team was each season, using two independent luck signals combined into a single composite score.
 
-Live site: *(enable GitHub Pages on `main` / root after pushing)*
+Live site: none yet. GitHub Pages is not currently enabled for this repo. To view the app, clone the repo and open `index.html` in a browser (or run `python3 -m http.server` in the repo root and visit `http://localhost:8000`; the local server is needed for the service worker and `data.json` fetch).
 
 ## What is the Luck Factor?
 
@@ -71,7 +71,7 @@ All data is fetched from the **MLB Stats API** (free, public, no authentication 
 - Regular season schedule → game-by-game scores for close-game calculation
 - Postseason schedule → bracket results for playoff outcome classification
 
-Payroll figures in the payroll scatter are hand-entered Opening Day payrolls embedded in `index.html` (not from the MLB Stats API; source not recorded). Luck and standings data come from the API.
+**Payroll figures are unsourced estimates.** The payroll scatter uses a hand-entered table (`PAYROLL_DATA` in `index.html`) whose original source was not recorded; it is not from the MLB Stats API. A spot check on 2026-10-19 against Baseball-Reference's team "Est. Payroll" column (`https://www.baseball-reference.com/leagues/majors/<year>-misc.shtml`, years 2016-2019 and 2021-2025, 239 team-seasons) found only rough agreement: mean absolute difference about $12.5M, and 94 of 239 values differ by more than 10% (e.g. 2016 TEX 161.2 vs 212.1, 2019 TOR 112.0 vs 62.2, 2017 SD 34.6 vs 49.2). Opening-day, season-end and luxury-tax payrolls are defined differently, and Baseball-Reference's figure is itself an estimate, so differences are not all errors; but the table cannot be verified against any one source and no values were changed. Spotrac and The Baseball Cube could not be fetched (HTTP 402/403) so were not checked. Treat payroll as approximate. Luck and standings data come from the API.
 
 The 2020 column is marked with `*` — that was a 60-game season, so luck values carry higher variance than normal years.
 
